@@ -13404,19 +13404,22 @@ function enelAbrirImpressaoAutomatica(retorno) {
 
     // Botão para cada arquivo
     arquivos.forEach(function(a, i) {
-      if (!a || !a.url) return;
+  if (!a || !a.url) return;
+  
+  // Tenta abrir automaticamente
+  const popup = setTimeout(() => {
+    const w = window.open(a.url, '_blank');
+    
+    // Se bloqueou (popup = null), mostra botão
+    if (!w) {
       const btn = document.createElement('button');
-      btn.textContent = (a.nome || ('📄 Documento ' + (i + 1)));
-      btn.style.cssText = `
-        background: linear-gradient(135deg, #00B8E6, #7B2CBF);
-        border: none; border-radius: 10px; padding: 12px 20px;
-        color: #fff; font-size: 14px; font-weight: 700;
-        cursor: pointer; text-align: center;
-        box-shadow: 0 4px 16px rgba(0,184,230,0.3);
-      `;
+      btn.textContent = a.nome || ('📄 Documento ' + (i + 1));
+      btn.style.cssText = `background:linear-gradient(135deg,#00B8E6,#7B2CBF); border:none; border-radius:10px; padding:12px 20px; color:#fff; font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(0,184,230,0.3);`;
       btn.onclick = function() { window.open(a.url, '_blank'); };
       container.appendChild(btn);
-    });
+    }
+  }, 250 * i);
+});
 
     // Botão fechar
     const btnFechar = document.createElement('button');
