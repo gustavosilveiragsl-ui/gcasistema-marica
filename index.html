@@ -13377,21 +13377,60 @@ function enelmsgAtendimento(txt, ok) {
 
 function enelAbrirImpressaoAutomatica(retorno) {
   try {
-    const imp = retorno && retorno.impressao ? retorno.impressao : null;
+    const imp      = retorno && retorno.impressao ? retorno.impressao : null;
     const arquivos = imp && Array.isArray(imp.arquivos) ? imp.arquivos : [];
 
     if (!arquivos.length) return;
 
-    // abre em sequência para reduzir bloqueio do navegador
-    // (alguns navegadores bloqueiam múltiplos popups, mas 2 geralmente passa)
-    arquivos.forEach((a, i) => {
+    // Cria ou reutiliza o container de botões de impressão
+    let container = document.getElementById('enelBotoesImpressao');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'enelBotoesImpressao';
+      container.style.cssText = `
+        position: fixed; bottom: 24px; right: 24px;
+        display: flex; flex-direction: column; gap: 10px;
+        z-index: 9999;
+      `;
+      document.body.appendChild(container);
+    }
+    container.innerHTML = '';
+
+    // Título
+    const titulo = document.createElement('div');
+    titulo.style.cssText = 'background:rgba(0,184,230,0.15); border:1px solid rgba(0,184,230,0.3); border-radius:10px; padding:8px 14px; color:#00B8E6; font-size:13px; font-weight:700; text-align:center;';
+    titulo.textContent = '🖨️ PDFs prontos para imprimir';
+    container.appendChild(titulo);
+
+    // Botão para cada arquivo
+    arquivos.forEach(function(a, i) {
       if (!a || !a.url) return;
-      setTimeout(() => {
-        window.open(a.url, '_blank');
-      }, 250 * i);
+      const btn = document.createElement('button');
+      btn.textContent = (a.nome || ('📄 Documento ' + (i + 1)));
+      btn.style.cssText = `
+        background: linear-gradient(135deg, #00B8E6, #7B2CBF);
+        border: none; border-radius: 10px; padding: 12px 20px;
+        color: #fff; font-size: 14px; font-weight: 700;
+        cursor: pointer; text-align: center;
+        box-shadow: 0 4px 16px rgba(0,184,230,0.3);
+      `;
+      btn.onclick = function() { window.open(a.url, '_blank'); };
+      container.appendChild(btn);
     });
-  } catch (e) {
-    console.error('Falha ao abrir PDFs de impressão:', e);
+
+    // Botão fechar
+    const btnFechar = document.createElement('button');
+    btnFechar.textContent = '✕ Fechar';
+    btnFechar.style.cssText = `
+      background: rgba(71,85,105,0.5); border: 1px solid rgba(148,163,184,0.2);
+      border-radius: 10px; padding: 8px; color: #94a3b8;
+      font-size: 12px; cursor: pointer;
+    `;
+    btnFechar.onclick = function() { container.remove(); };
+    container.appendChild(btnFechar);
+
+  } catch(e) {
+    console.error('Falha ao exibir botões de impressão:', e);
   }
 }
 
