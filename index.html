@@ -648,6 +648,7 @@
               <button class="menu-group-toggle">Indicadores 📊</button>
               <ul class="submenu">
               <li><button data-view="indicadores">📈 Dash de Indicadores</button></li>
+              <li><button data-view="analise-trocas">⚠️ Análise de Trocas</button></li>
               </ul>
               </li>
 
@@ -1102,6 +1103,82 @@
       <p id="gestDetMsg" style="text-align:center; margin-top:12px; font-size:13px; min-height:18px;"></p>
     </div>
   </div>
+
+  <!-- Modal Editar -->
+ <div id="modalEditarSol" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9);
+  z-index:10002; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:linear-gradient(180deg,#1e293b,#0f172a); border:1px solid rgba(0,184,230,0.2);
+    border-radius:20px; width:min(680px,96vw); max-height:92vh; overflow-y:auto; padding:28px;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div>
+        <h3 style="color:#fff; margin:0;">✏️ Editar Itens</h3>
+        <div id="editSolId" style="font-size:12px; color:#00B8E6; font-family:monospace; margin-top:4px;"></div>
+      </div>
+      <button onclick="fecharEdicaoSolicitacao()"
+        style="background:rgba(71,85,105,0.4); border:none; border-radius:8px;
+        padding:8px 14px; color:#94a3b8; cursor:pointer; font-size:18px;">✕</button>
+    </div>
+
+    <!-- Lista de itens editável -->
+    <div style="font-size:11px; color:#00B8E6; text-transform:uppercase; letter-spacing:1px;
+      margin-bottom:10px; font-weight:700;">📦 Itens Atuais</div>
+    <div id="editSolItens" style="margin-bottom:20px;"></div>
+
+    <!-- Adicionar item -->
+    <div style="background:rgba(0,0,0,0.25); border-radius:14px; padding:16px; margin-bottom:16px;
+      border:1px solid rgba(255,255,255,0.04);">
+      <div style="font-size:11px; color:#00B8E6; text-transform:uppercase; letter-spacing:1px;
+        margin-bottom:12px; font-weight:700;">➕ Adicionar Item</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px;">
+        <div style="position:relative;">
+          <label style="font-size:11px; color:#64748b; display:block; margin-bottom:6px;">Item</label>
+          <input id="editSolItemBusca" type="text" placeholder="Digite o nome..."
+            oninput="filtrarItensEdicaoSol()"
+            style="width:100%; background:rgba(7,13,26,0.8); border:1px solid rgba(148,163,184,0.2);
+            border-radius:10px; padding:10px 12px; color:#fff; font-size:13px;">
+          <div id="editSolItemLista" style="display:none; position:absolute; top:100%; left:0; right:0;
+            background:rgba(10,17,32,0.98); border:1px solid rgba(0,184,230,0.25); border-radius:10px;
+            max-height:200px; overflow-y:auto; z-index:200; box-shadow:0 16px 48px rgba(0,0,0,0.5);"></div>
+          <input id="editSolItemId"   type="hidden">
+          <input id="editSolItemNome" type="hidden">
+        </div>
+        <div>
+          <label style="font-size:11px; color:#64748b; display:block; margin-bottom:6px;">Quantidade</label>
+          <input id="editSolItemQtd" type="number" min="1" value="1"
+            style="width:100%; background:rgba(7,13,26,0.8); border:1px solid rgba(148,163,184,0.2);
+            border-radius:10px; padding:10px 12px; color:#fff; font-size:13px;">
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px; color:#64748b; display:block; margin-bottom:6px;">Motivo</label>
+        <select id="editSolItemMotivo"
+          style="width:100%; background:rgba(7,13,26,0.8); border:1px solid rgba(148,163,184,0.2);
+          border-radius:10px; padding:10px 12px; color:#fff; font-size:13px;">
+          <option value="">Selecione...</option>
+          <option value="Entrega inicial">📥 Entrega inicial</option>
+          <option value="Desgastado">🪨 Desgastado</option>
+          <option value="Avariado por mau uso">⚠️ Avariado por mau uso</option>
+          <option value="Perdido">🔍 Perdido</option>
+          <option value="Roubado">🚨 Roubado</option>
+          <option value="Reposição">🔄 Reposição</option>
+        </select>
+      </div>
+      <button onclick="adicionarItemEdicaoSol()"
+        style="width:100%; background:rgba(0,184,230,0.1); border:1.5px dashed rgba(0,184,230,0.4);
+        border-radius:10px; padding:12px; color:#00B8E6; font-size:14px; font-weight:600; cursor:pointer;">
+        ➕ Adicionar Item
+      </button>
+    </div>
+
+    <p id="editSolMsg" style="text-align:center; font-size:13px; min-height:18px; margin-bottom:12px;"></p>
+    <button onclick="salvarEdicaoSolicitacao()"
+      style="width:100%; background:linear-gradient(135deg,#00B8E6,#7B2CBF); border:none;
+      border-radius:12px; padding:14px; color:#fff; font-size:15px; font-weight:700; cursor:pointer;">
+      💾 Salvar Alterações
+    </button>
+  </div>
+</div>
 
 </section>
 
@@ -1845,6 +1922,28 @@
   </div>
 
   <p id="msgPendencias" style="text-align:center; margin-top:20px; color:#64748b; font-size:14px;"></p>
+
+<div id="modalVerItens" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85);
+  z-index:10002; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:linear-gradient(180deg,#1e293b,#0f172a); border:1px solid rgba(168,85,247,0.3);
+    border-radius:20px; width:min(560px,96vw); max-height:85vh; overflow-y:auto; padding:28px;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div>
+        <h3 style="color:#fff; margin:0;">📦 Itens do Atendimento</h3>
+        <div id="modalVerItensNome" style="font-size:13px; color:#a855f7; margin-top:4px; font-weight:600;"></div>
+        <div id="modalVerItensData" style="font-size:12px; color:#64748b; margin-top:2px;"></div>
+      </div>
+      <button onclick="document.getElementById('modalVerItens').style.display='none'"
+        style="background:rgba(71,85,105,0.4); border:none; border-radius:8px;
+        padding:8px 14px; color:#94a3b8; cursor:pointer; font-size:18px;">✕</button>
+    </div>
+
+    <div id="modalVerItensLista"></div>
+
+  </div>
+</div>
+
 </section>
 
 
@@ -5102,6 +5201,207 @@
   </div><!-- /indConteudo -->
 </section>
 
+       <!-- ==================== VIEW ANÁLISE DE TROCAS ==================== -->
+<section class="view hidden" id="view-analise-trocas">
+
+  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; margin-bottom:24px;">
+    <div>
+      <h2 style="margin:0;">⚠️ Análise de Trocas Precoces</h2>
+      <p class="muted" style="margin:6px 0 0;">Itens trocados antes do prazo estimado de durabilidade.</p>
+    </div>
+    <button onclick="exportarAnaliseTrocasCSV()"
+      style="background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3);
+      border-radius:10px; padding:10px 20px; color:#22c55e; font-size:14px; font-weight:600; cursor:pointer;">
+      📥 Exportar CSV
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <div style="background:rgba(17,24,39,0.8); border:1px solid rgba(0,184,230,0.2);
+    border-radius:16px; padding:20px; margin-bottom:24px;">
+    <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;">
+      <div style="flex:1; min-width:140px;">
+        <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">📅 Data Início</label>
+        <input type="date" id="trocaDataInicio"
+          style="width:100%; background:rgba(0,0,0,0.4); border:1px solid rgba(0,184,230,0.3);
+          border-radius:10px; padding:10px 14px; color:#fff; font-size:14px;">
+      </div>
+      <div style="flex:1; min-width:140px;">
+        <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">📅 Data Fim</label>
+        <input type="date" id="trocaDataFim"
+          style="width:100%; background:rgba(0,0,0,0.4); border:1px solid rgba(0,184,230,0.3);
+          border-radius:10px; padding:10px 14px; color:#fff; font-size:14px;">
+      </div>
+      <div style="flex:1; min-width:140px;">
+        <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">🏭 Armazém</label>
+        <select id="trocaArmazem"
+          style="width:100%; background:rgba(0,0,0,0.4); border:1px solid rgba(0,184,230,0.3);
+          border-radius:10px; padding:10px 14px; color:#fff; font-size:14px;">
+          <option value="">Todos</option>
+        </select>
+      </div>
+      <div style="flex:1; min-width:140px;">
+        <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">👤 Colaborador</label>
+        <input type="text" id="trocaColab" placeholder="Filtrar por nome..."
+          style="width:100%; background:rgba(0,0,0,0.4); border:1px solid rgba(0,184,230,0.3);
+          border-radius:10px; padding:10px 14px; color:#fff; font-size:14px;">
+      </div>
+      <div style="flex:1; min-width:140px;">
+        <label style="font-size:12px; color:#94a3b8; display:block; margin-bottom:6px;">📦 Item</label>
+        <input type="text" id="trocaItem" placeholder="Filtrar por item..."
+          style="width:100%; background:rgba(0,0,0,0.4); border:1px solid rgba(0,184,230,0.3);
+          border-radius:10px; padding:10px 14px; color:#fff; font-size:14px;">
+      </div>
+      <button onclick="carregarAnaliseTrocas()"
+        style="background:linear-gradient(135deg,#00B8E6,#0ea5e9); color:#fff; border:none;
+        border-radius:10px; padding:10px 28px; font-size:14px; font-weight:600; cursor:pointer; height:42px;">
+        🔄 Filtrar
+      </button>
+    </div>
+    <!-- Períodos rápidos -->
+    <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
+      <button onclick="definirPeriodoTroca(30)"
+        style="background:rgba(0,184,230,0.1); color:#00B8E6; border:1px solid rgba(0,184,230,0.3);
+        border-radius:8px; padding:6px 14px; font-size:12px; cursor:pointer;">30 dias</button>
+      <button onclick="definirPeriodoTroca(90)"
+        style="background:rgba(0,184,230,0.1); color:#00B8E6; border:1px solid rgba(0,184,230,0.3);
+        border-radius:8px; padding:6px 14px; font-size:12px; cursor:pointer;">90 dias</button>
+      <button onclick="definirPeriodoTroca(180)"
+        style="background:rgba(0,184,230,0.1); color:#00B8E6; border:1px solid rgba(0,184,230,0.3);
+        border-radius:8px; padding:6px 14px; font-size:12px; cursor:pointer;">6 meses</button>
+      <button onclick="definirPeriodoTroca(365)"
+        style="background:rgba(0,184,230,0.1); color:#00B8E6; border:1px solid rgba(0,184,230,0.3);
+        border-radius:8px; padding:6px 14px; font-size:12px; cursor:pointer;">1 ano</button>
+      <button onclick="definirPeriodoTroca(0)"
+        style="background:rgba(0,184,230,0.1); color:#00B8E6; border:1px solid rgba(0,184,230,0.3);
+        border-radius:8px; padding:6px 14px; font-size:12px; cursor:pointer;">Tudo</button>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div id="trocaLoading" style="display:none; text-align:center; padding:60px;">
+    <div style="font-size:48px; margin-bottom:16px; animation:spin 1s linear infinite; display:inline-block;">⚙️</div>
+    <div style="color:#94a3b8; font-size:16px;">Carregando análise...</div>
+  </div>
+
+  <div id="trocaConteudo" style="display:none;">
+
+    <!-- Cards resumo -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-bottom:24px;">
+      <div style="background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(239,68,68,0.05));
+        border:1px solid rgba(239,68,68,0.3); border-radius:16px; padding:20px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:8px;">⚠️</div>
+        <div id="trocaTotal" style="font-size:28px; font-weight:700; color:#ef4444;">—</div>
+        <div style="font-size:12px; color:#94a3b8; margin-top:4px;">Total de Trocas Precoces</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.05));
+        border:1px solid rgba(245,158,11,0.3); border-radius:16px; padding:20px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:8px;">📦</div>
+        <div id="trocaItensUnicos" style="font-size:28px; font-weight:700; color:#f59e0b;">—</div>
+        <div style="font-size:12px; color:#94a3b8; margin-top:4px;">Itens Afetados</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(168,85,247,0.15),rgba(168,85,247,0.05));
+        border:1px solid rgba(168,85,247,0.3); border-radius:16px; padding:20px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:8px;">👤</div>
+        <div id="trocaColabsUnicos" style="font-size:28px; font-weight:700; color:#a855f7;">—</div>
+        <div style="font-size:12px; color:#94a3b8; margin-top:4px;">Colaboradores Envolvidos</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(59,130,246,0.05));
+        border:1px solid rgba(59,130,246,0.3); border-radius:16px; padding:20px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:8px;">📉</div>
+        <div id="trocaMediaAdiant" style="font-size:28px; font-weight:700; color:#3b82f6;">—</div>
+        <div style="font-size:12px; color:#94a3b8; margin-top:4px;">Média Dias Adiantado</div>
+      </div>
+      <div style="background:linear-gradient(135deg,rgba(0,184,230,0.15),rgba(0,184,230,0.05));
+        border:1px solid rgba(0,184,230,0.3); border-radius:16px; padding:20px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:8px;">📊</div>
+        <div id="trocaEficiencia" style="font-size:28px; font-weight:700; color:#00B8E6;">—</div>
+        <div style="font-size:12px; color:#94a3b8; margin-top:4px;">Eficiência Média (%)</div>
+      </div>
+    </div>
+
+    <!-- Gráficos -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px;">
+      <div style="background:rgba(17,24,39,0.8); border:1px solid rgba(239,68,68,0.2);
+        border-radius:16px; padding:24px;">
+        <h3 style="margin:0 0 20px; color:#fff; font-size:16px;">📦 Top Itens com Mais Trocas Precoces</h3>
+        <div style="position:relative; height:280px;">
+          <canvas id="chartTrocaItens"></canvas>
+        </div>
+      </div>
+      <div style="background:rgba(17,24,39,0.8); border:1px solid rgba(168,85,247,0.2);
+        border-radius:16px; padding:24px;">
+        <h3 style="margin:0 0 20px; color:#fff; font-size:16px;">👤 Top Colaboradores com Mais Trocas</h3>
+        <div style="position:relative; height:280px;">
+          <canvas id="chartTrocaColabs"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Evolução por mês -->
+    <div style="background:rgba(17,24,39,0.8); border:1px solid rgba(0,184,230,0.2);
+      border-radius:16px; padding:24px; margin-bottom:24px;">
+      <h3 style="margin:0 0 20px; color:#fff; font-size:16px;">📈 Evolução de Trocas Precoces por Mês</h3>
+      <div style="position:relative; height:260px;">
+        <canvas id="chartTrocaMes"></canvas>
+      </div>
+    </div>
+
+    <!-- Ranking itens — durabilidade real vs estimada -->
+    <div style="background:rgba(17,24,39,0.8); border:1px solid rgba(245,158,11,0.2);
+      border-radius:16px; padding:24px; margin-bottom:24px;">
+      <h3 style="margin:0 0 6px; color:#fff; font-size:16px;">📊 Durabilidade Real vs Estimada por Item</h3>
+      <p style="color:#94a3b8; font-size:13px; margin-bottom:20px;">Média de dias que o item durou vs prazo estimado cadastrado.</p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:2px solid rgba(245,158,11,0.3);">
+              <th style="padding:12px; text-align:left; color:#f59e0b; font-size:13px;">Item</th>
+              <th style="padding:12px; text-align:center; color:#f59e0b; font-size:13px;">Trocas</th>
+              <th style="padding:12px; text-align:center; color:#f59e0b; font-size:13px;">Prazo Estimado</th>
+              <th style="padding:12px; text-align:center; color:#f59e0b; font-size:13px;">Média Real</th>
+              <th style="padding:12px; text-align:center; color:#f59e0b; font-size:13px;">Eficiência</th>
+              <th style="padding:12px; text-align:left; color:#f59e0b; font-size:13px;">Avaliação</th>
+            </tr>
+          </thead>
+          <tbody id="tbAnaliseDurabilidade"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Tabela detalhada -->
+    <div style="background:rgba(17,24,39,0.8); border:1px solid rgba(239,68,68,0.2);
+      border-radius:16px; padding:24px; margin-bottom:40px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div>
+          <h3 style="margin:0 0 4px; color:#fff; font-size:16px;">📋 Registros Detalhados</h3>
+          <p style="color:#94a3b8; font-size:13px; margin:0;">Todos os registros de trocas precoces no período.</p>
+        </div>
+        <span id="trocaTotalRegistros" style="font-size:13px; color:#64748b;"></span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse;">
+          <thead>
+            <tr style="border-bottom:2px solid rgba(239,68,68,0.3);">
+              <th style="padding:12px; text-align:left; color:#f87171; font-size:12px;">Data</th>
+              <th style="padding:12px; text-align:left; color:#f87171; font-size:12px;">Colaborador</th>
+              <th style="padding:12px; text-align:left; color:#f87171; font-size:12px;">Item</th>
+              <th style="padding:12px; text-align:center; color:#f87171; font-size:12px;">Durou</th>
+              <th style="padding:12px; text-align:center; color:#f87171; font-size:12px;">Prazo</th>
+              <th style="padding:12px; text-align:center; color:#f87171; font-size:12px;">Eficiência</th>
+              <th style="padding:12px; text-align:left; color:#f87171; font-size:12px;">Motivo</th>
+              <th style="padding:12px; text-align:left; color:#f87171; font-size:12px;">Justificativa</th>
+              <th style="padding:12px; text-align:left; color:#f87171; font-size:12px;">Origem</th>
+            </tr>
+          </thead>
+          <tbody id="tbTrocasDetalhadas"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /trocaConteudo -->
+</section>
+
 
 
 
@@ -5153,6 +5453,10 @@ function mostrarView(viewId) {
        carregarListaFichaEPI();
     }
 
+     if (viewId === 'analise-trocas') {
+       carregarAnaliseTrocas();
+    }
+ 
     if (viewId === 'controle-materiais-equipe') {
       carregarControleMateriaisEquipe();
     }
@@ -5315,17 +5619,14 @@ setTimeout(function iniciaPollingSolicitacoes() {
           atualizarBadgeSolicitacoes();
         }
       }
-      setTimeout(iniciaPollingSolicitacoes, 120000); // repete a cada 2 min
+      setTimeout(iniciaPollingSolicitacoes, 120000);
     })
     .withFailureHandler(function() {
       setTimeout(iniciaPollingSolicitacoes, 120000);
     })
     .listarSolicitacoesMaterial({});
-}, 5000); // começa 5 segundos após o carregamento
+}, 5000);
 });
-
-
-
     
 $('#lgPass')?.addEventListener('keypress', function(e) {
   if (e.key === 'Enter') fazerLogin();
@@ -8441,6 +8742,7 @@ if (atendItemMotivoEl) {
                 `Deseja prosseguir com o lançamento?`;
               if (!confirm(msg)) return;
             }
+            
             executarAdicionarItemAtendimento(itemId, armazemId, qtd, motivo);
           })
           .withFailureHandler(function() {
@@ -13377,63 +13679,21 @@ function enelmsgAtendimento(txt, ok) {
 
 function enelAbrirImpressaoAutomatica(retorno) {
   try {
-    const imp      = retorno && retorno.impressao ? retorno.impressao : null;
+    const imp = retorno && retorno.impressao ? retorno.impressao : null;
     const arquivos = imp && Array.isArray(imp.arquivos) ? imp.arquivos : [];
 
     if (!arquivos.length) return;
 
-    // Cria ou reutiliza o container de botões de impressão
-    let container = document.getElementById('enelBotoesImpressao');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'enelBotoesImpressao';
-      container.style.cssText = `
-        position: fixed; bottom: 24px; right: 24px;
-        display: flex; flex-direction: column; gap: 10px;
-        z-index: 9999;
-      `;
-      document.body.appendChild(container);
-    }
-    container.innerHTML = '';
-
-    // Título
-    const titulo = document.createElement('div');
-    titulo.style.cssText = 'background:rgba(0,184,230,0.15); border:1px solid rgba(0,184,230,0.3); border-radius:10px; padding:8px 14px; color:#00B8E6; font-size:13px; font-weight:700; text-align:center;';
-    titulo.textContent = '🖨️ PDFs prontos para imprimir';
-    container.appendChild(titulo);
-
-    // Botão para cada arquivo
-    arquivos.forEach(function(a, i) {
-  if (!a || !a.url) return;
-  
-  // Tenta abrir automaticamente
-  const popup = setTimeout(() => {
-    const w = window.open(a.url, '_blank');
-    
-    // Se bloqueou (popup = null), mostra botão
-    if (!w) {
-      const btn = document.createElement('button');
-      btn.textContent = a.nome || ('📄 Documento ' + (i + 1));
-      btn.style.cssText = `background:linear-gradient(135deg,#00B8E6,#7B2CBF); border:none; border-radius:10px; padding:12px 20px; color:#fff; font-size:14px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(0,184,230,0.3);`;
-      btn.onclick = function() { window.open(a.url, '_blank'); };
-      container.appendChild(btn);
-    }
-  }, 250 * i);
-});
-
-    // Botão fechar
-    const btnFechar = document.createElement('button');
-    btnFechar.textContent = '✕ Fechar';
-    btnFechar.style.cssText = `
-      background: rgba(71,85,105,0.5); border: 1px solid rgba(148,163,184,0.2);
-      border-radius: 10px; padding: 8px; color: #94a3b8;
-      font-size: 12px; cursor: pointer;
-    `;
-    btnFechar.onclick = function() { container.remove(); };
-    container.appendChild(btnFechar);
-
-  } catch(e) {
-    console.error('Falha ao exibir botões de impressão:', e);
+    // abre em sequência para reduzir bloqueio do navegador
+    // (alguns navegadores bloqueiam múltiplos popups, mas 2 geralmente passa)
+    arquivos.forEach((a, i) => {
+      if (!a || !a.url) return;
+      setTimeout(() => {
+        window.open(a.url, '_blank');
+      }, 250 * i);
+    });
+  } catch (e) {
+    console.error('Falha ao abrir PDFs de impressão:', e);
   }
 }
 
@@ -13605,7 +13865,8 @@ function abrirModalConfirmacao(atendimentoId, nomeColaborador, qtdItens) {
 
       google.script.run
         .withSuccessHandler(function(urlBase) {
-          const link = urlBase + '?token=' + res.token;
+          const separator = urlBase.includes('?') ? '&' : '?';
+          const link = urlBase + separator + 'token=' + res.token;
           _linkConfirmacaoAtual = link;
 
           // Preenche as infos no modal
@@ -13821,28 +14082,38 @@ function renderizarTabelaPendencias() {
     // Botões de ação
     let acoes = '';
     if (item.status === 'PENDENTE') {
-      acoes = `
-        <button onclick="reenviarLink('${item.id}', '${item.nomeColaborador}', '${item.token}')"
-          style="background:rgba(0,184,230,0.15); border:1px solid rgba(0,184,230,0.3);
-          color:#00B8E6; border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; margin:2px;">
-          📲 Reenviar
-        </button>`;
-    } else if (item.status === 'EXPIRADO') {
-      acoes = `
-        <button onclick="renovarLink('${item.id}', '${item.nomeColaborador}', ${item.qtdItens})"
-          style="background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3);
-          color:#f59e0b; border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; margin:2px;">
-          🔄 Novo Link
-        </button>`;
-    } else if (item.pdfUrl) {
-      acoes = `
-        <a href="${item.pdfUrl}" target="_blank"
-          style="background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3);
-          color:#22c55e; border-radius:8px; padding:6px 12px; font-size:12px;
-          cursor:pointer; text-decoration:none; display:inline-block; margin:2px;">
-          📄 Ver PDF
-        </a>`;
-    }
+  acoes = `
+    <button onclick="reenviarLink('${item.id}', '${item.nomeColaborador}', '${item.token}')"
+      style="background:rgba(0,184,230,0.15); border:1px solid rgba(0,184,230,0.3);
+      color:#00B8E6; border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; margin:2px;">
+      📲 Reenviar
+    </button>
+    <button onclick="verItensPendencia('${item.id}')"
+      style="background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3);
+      color:#a855f7; border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; margin:2px;">
+      👁️ Ver Itens
+    </button>`;
+} else if (item.status === 'EXPIRADO') {
+  acoes = `
+    <button onclick="renovarLink('${item.id}', '${item.nomeColaborador}', ${item.qtdItens})"
+      style="background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.3);
+      color:#f59e0b; border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; margin:2px;">
+      🔄 Novo Link
+    </button>
+    <button onclick="verItensPendencia('${item.id}')"
+      style="background:rgba(168,85,247,0.15); border:1px solid rgba(168,85,247,0.3);
+      color:#a855f7; border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; margin:2px;">
+      👁️ Ver Itens
+    </button>`;
+} else if (item.pdfUrl) {
+  acoes = `
+    <a href="${item.pdfUrl}" target="_blank"
+      style="background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.3);
+      color:#22c55e; border-radius:8px; padding:6px 12px; font-size:12px;
+      cursor:pointer; text-decoration:none; display:inline-block; margin:2px;">
+      📄 Ver PDF
+    </a>`;
+}
 
     // Botão cancelar (não assinados)
 const perfilPermitido = usuarioLogado && ['admin', 'gestor'].includes(usuarioLogado.role);
@@ -13946,7 +14217,8 @@ function reenviarLink(atendimentoId, nomeColaborador, tokenAtual) {
 
   google.script.run
     .withSuccessHandler(function(urlBase) {
-      const link = urlBase + '?token=' + tokenAtual;
+      const separator = urlBase.includes('?') ? '&' : '?';
+      const link = urlBase + separator + 'token=' + tokenAtual;
       _linkConfirmacaoAtual = link;
 
       document.getElementById('modalNomeColab').textContent = nomeColaborador;
@@ -18538,10 +18810,22 @@ function carregarSolicitacoesGestao() {
     .withSuccessHandler(function(res) {
       if (!res.sucesso) { console.error(res.erro); return; }
       window._todasSolicitacoes = res.lista || [];
-      window._gestSolPagina = 1; // ← reseta paginação ao recarregar
-      popularFiltroArmazem();    // ← popula o filtro de armazém
-      renderSolicitacoesGestao();
-      atualizarBadgeSolicitacoes();
+      window._gestSolPagina = 1;
+      popularFiltroArmazem();
+
+      // Busca colaboradores com assinaturas pendentes
+      google.script.run
+        .withSuccessHandler(function(colabsComPendencia) {
+          window._colabsComAssinaturaPendente = colabsComPendencia || [];
+          renderSolicitacoesGestao();
+          atualizarBadgeSolicitacoes();
+        })
+        .withFailureHandler(function() {
+          window._colabsComAssinaturaPendente = [];
+          renderSolicitacoesGestao();
+          atualizarBadgeSolicitacoes();
+        })
+        .listarColaboradoresComAssinaturasPendentes();
     })
     .withFailureHandler(function(err) {
       console.error('Erro solicitações:', err);
@@ -18650,6 +18934,13 @@ function renderSolicitacoesGestao() {
       ? `<span style="background:rgba(168,85,247,0.2); color:#a855f7; border:1px solid rgba(168,85,247,0.4); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700;">👕 Troca de Tamanho</span>`
       : '';
 
+// ← TAG ASSINATURA PENDENTE
+const temAssinaturaPendente = (window._colabsComAssinaturaPendente || [])
+  .includes(s.colaboradorId);
+const tagPendentes = temAssinaturaPendente
+  ? `<span style="background:rgba(239,68,68,0.2); color:#ef4444; border:1px solid rgba(239,68,68,0.4); padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700;">✍️ Assinatura pendente</span>`
+  : '';
+     
     // ← TAG ITEM FORA DO PRAZO
     const temForaPrazo = (s.itens || []).some(it => it.motivo && it.motivo.includes('Justificativa:'));
     const tagForaPrazo = temForaPrazo
@@ -18673,6 +18964,7 @@ function renderSolicitacoesGestao() {
             ${urgente}
             ${tagTroca}
             ${tagForaPrazo}
+            ${tagPendentes}
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
             ${badgeSt}
@@ -18820,6 +19112,11 @@ function abrirGestSol(id) {
         padding:14px; color:#fff; font-size:15px; font-weight:700; cursor:pointer; width:100%;">
         ✅ Atender Pedido — Gerar Atendimento
       </button>
+      <button onclick="abrirEdicaoSolicitacao()"
+      style="background:rgba(0,184,230,0.12); border:1px solid rgba(0,184,230,0.3); border-radius:12px;
+      padding:12px; color:#00B8E6; font-size:14px; font-weight:600; cursor:pointer; width:100%;">
+      ✏️ Editar Itens da Solicitação
+    </button>
       <button onclick="mudarStatusGestSol('CANCELADO')"
         style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); border-radius:12px;
         padding:12px; color:#ef4444; font-size:14px; font-weight:600; cursor:pointer; width:100%;">
@@ -18855,6 +19152,15 @@ function abrirGestSol(id) {
         padding:13px; color:#00B8E6; font-size:14px; font-weight:700; cursor:pointer; width:100%;">
         🚚 Marcar como Em Trânsito
       </button>
+      <button onclick="mudarStatusGestSol('CANCELADO')"
+        style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); border-radius:12px;
+        padding:12px; color:#ef4444; font-size:14px; font-weight:600; cursor:pointer; width:100%;">
+        ❌ Cancelar Solicitação
+      </button>`;
+  }
+ 
+ if (s.status === 'EM TRANSITO') {
+    acoes.innerHTML += `
       <button onclick="mudarStatusGestSol('CANCELADO')"
         style="background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); border-radius:12px;
         padding:12px; color:#ef4444; font-size:14px; font-weight:600; cursor:pointer; width:100%;">
@@ -19020,6 +19326,165 @@ function gestBadgeStatus(status) {
   return map[status] || `<span style="background:rgba(148,163,184,0.2); color:#94a3b8; padding:4px 12px; border-radius:20px; font-size:12px;">${status}</span>`;
 }
 
+     // ── Edição de solicitação ──
+let _editSolItens = [];
+
+function abrirEdicaoSolicitacao() {
+  const s = window._gestSolAtual;
+  if (!s) return;
+
+  _editSolItens = JSON.parse(JSON.stringify(s.itens || []));
+
+  document.getElementById('editSolId').textContent   = s.id;
+  document.getElementById('editSolItemBusca').value  = '';
+  document.getElementById('editSolItemId').value     = '';
+  document.getElementById('editSolItemNome').value   = '';
+  document.getElementById('editSolItemQtd').value    = '1';
+  document.getElementById('editSolItemMotivo').value = '';
+  document.getElementById('editSolMsg').textContent  = '';
+
+  renderEditSolItens();
+  document.getElementById('modalEditarSol').style.display = 'flex';
+}
+
+function fecharEdicaoSolicitacao() {
+  document.getElementById('modalEditarSol').style.display = 'none';
+}
+
+function renderEditSolItens() {
+  const el = document.getElementById('editSolItens');
+  if (!_editSolItens.length) {
+    el.innerHTML = '<p style="color:#64748b; text-align:center; padding:16px; font-size:13px;">Nenhum item. Adicione pelo menos um.</p>';
+    return;
+  }
+  el.innerHTML = _editSolItens.map((it, idx) => `
+    <div style="display:flex; justify-content:space-between; align-items:center;
+      background:rgba(0,184,230,0.05); border:1px solid rgba(0,184,230,0.15);
+      border-radius:10px; padding:12px 16px; margin-bottom:8px;">
+      <div>
+        <div style="font-weight:700; color:#e2e8f0; font-size:13px;">${it.nome}</div>
+        <div style="font-size:11px; color:#64748b; margin-top:2px;">
+          Qtd: <strong style="color:#00B8E6;">${it.quantidade}</strong> · ${it.motivo}
+        </div>
+      </div>
+      <button onclick="_editSolItens.splice(${idx},1); renderEditSolItens();"
+        style="background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3);
+        border-radius:6px; padding:4px 10px; color:#ef4444; font-size:12px; cursor:pointer;">
+        ✕
+      </button>
+    </div>`).join('');
+}
+
+function filtrarItensEdicaoSol() {
+  const termo = document.getElementById('editSolItemBusca').value.trim().toLowerCase();
+  const lista = document.getElementById('editSolItemLista');
+  document.getElementById('editSolItemId').value   = '';
+  document.getElementById('editSolItemNome').value = '';
+  if (!termo) { lista.style.display = 'none'; return; }
+
+  const res = (window.itens || [])
+    .filter(i => i.descricao.toLowerCase().includes(termo) || i.codigo.toLowerCase().includes(termo))
+    .slice(0, 10);
+
+  if (!res.length) {
+    lista.innerHTML = '<div style="padding:10px 14px; color:#64748b; font-size:13px;">Nenhum resultado</div>';
+    lista.style.display = 'block';
+    return;
+  }
+
+  lista.innerHTML = res.map(i => `
+    <div onmousedown="selecionarItemEdicaoSol('${i.id}','${i.descricao.replace(/'/g,"\\'")}','${i.codigo}')"
+      style="padding:10px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.04);"
+      onmouseover="this.style.background='rgba(0,184,230,0.1)'"
+      onmouseout="this.style.background=''">
+      <div style="font-weight:600; color:#e2e8f0; font-size:13px;">${i.descricao}</div>
+      <div style="font-size:11px; color:#64748b;">${i.codigo} · ${i.categoria}</div>
+    </div>`).join('');
+  lista.style.display = 'block';
+}
+
+function selecionarItemEdicaoSol(id, nome, codigo) {
+  document.getElementById('editSolItemBusca').value  = nome;
+  document.getElementById('editSolItemId').value     = id;
+  document.getElementById('editSolItemNome').value   = nome;
+  document.getElementById('editSolItemLista').style.display = 'none';
+  document.getElementById('editSolItemQtd').focus();
+}
+
+document.getElementById('editSolItemBusca')?.addEventListener('blur', () =>
+  setTimeout(() => document.getElementById('editSolItemLista').style.display = 'none', 200)
+);
+
+function adicionarItemEdicaoSol() {
+  const itemId = document.getElementById('editSolItemId').value;
+  const nome   = document.getElementById('editSolItemNome').value;
+  const qtd    = parseInt(document.getElementById('editSolItemQtd').value) || 0;
+  const motivo = document.getElementById('editSolItemMotivo').value;
+  const msg    = document.getElementById('editSolMsg');
+
+  if (!itemId) { msg.style.color='#ef4444'; msg.textContent='Selecione um item.'; return; }
+  if (qtd <= 0){ msg.style.color='#ef4444'; msg.textContent='Informe a quantidade.'; return; }
+  if (!motivo) { msg.style.color='#ef4444'; msg.textContent='Selecione o motivo.'; return; }
+
+  const s = window._gestSolAtual;
+  _editSolItens.push({
+    itemId,
+    nome,
+    quantidade: qtd,
+    motivo,
+    armId:       s?.armazemId   || '',
+    nomeArmazem: s?.nomeArmazem || ''
+  });
+
+  document.getElementById('editSolItemBusca').value  = '';
+  document.getElementById('editSolItemId').value     = '';
+  document.getElementById('editSolItemNome').value   = '';
+  document.getElementById('editSolItemQtd').value    = '1';
+  document.getElementById('editSolItemMotivo').value = '';
+  msg.textContent = '';
+  renderEditSolItens();
+}
+
+function salvarEdicaoSolicitacao() {
+  const s   = window._gestSolAtual;
+  const msg = document.getElementById('editSolMsg');
+
+  if (!s) return;
+  if (!_editSolItens.length) {
+    msg.style.color = '#ef4444';
+    msg.textContent = 'Adicione pelo menos um item.';
+    return;
+  }
+
+  msg.style.color = '#94a3b8';
+  msg.textContent = '⏳ Salvando...';
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (!res.sucesso) {
+        msg.style.color = '#ef4444';
+        msg.textContent = '❌ ' + res.erro;
+        return;
+      }
+      // Atualiza local
+      s.itens = _editSolItens;
+      fecharEdicaoSolicitacao();
+
+      // Reabre o modal com dados atualizados
+      document.getElementById('gestDetItens').innerHTML = '';
+      abrirGestSol(s.id);
+      renderSolicitacoesGestao();
+
+      msg.style.color = '#22c55e';
+      msg.textContent = '✅ Salvo!';
+    })
+    .withFailureHandler(function(err) {
+      msg.style.color = '#ef4444';
+      msg.textContent = '❌ ' + err.message;
+    })
+    .editarItensSolicitacao(s.id, _editSolItens, usuarioLogado?.name || 'Almoxarifado');
+}
+
 
 function imprimirFichaSeparacao() {
   const nomeColab = document.getElementById('modalNomeColab')?.textContent || '—';
@@ -19043,7 +19508,21 @@ function imprimirFichaSeparacao() {
   });
 
   const agora    = new Date().toLocaleString('pt-BR');
-  const dataHoje = new Date().toLocaleDateString('pt-BR');
+const dataHoje = new Date().toLocaleDateString('pt-BR');
+
+// Busca dados do colaborador
+const colabId   = document.getElementById('atendColabId')?.value || 
+                  window._gestSolAtual?.colaboradorId || '';
+const colabData = (colaboradores || []).find(c => c.id === colabId) ||
+                  (colaboradores || []).find(c => c.nome === nomeColab);
+const funcaoColab = colabData?.funcao || '—';
+const setorColab  = colabData?.setor  || colabData?.base || '—';
+
+     // Busca dados da solicitação vinculada
+const solId     = window.__SOLICITACAO_ATENDIMENTO_ID__ || 
+                  window._gestSolAtual?.id || '';
+const solData   = (window._todasSolicitacoes || []).find(s => s.id === solId);
+const solicitanteNome = solData?.solicitanteNome || '—';
 
   // Gera QR code como imagem base64 usando a biblioteca já carregada na página
   let qrImageSrc = '';
@@ -19128,9 +19607,13 @@ function imprimirFichaSeparacao() {
         </div>
       </div>
 
-      <div class="info-box">
-        <p><strong>Colaborador:</strong> ${nomeColab}</p>
-        <p><strong>Total de itens:</strong> ${itensAtend.length} tipo(s) · ${itensAtend.reduce((s, i) => s + (Number(i.quantidade) || 1), 0)} unidade(s)</p>
+       <div class="info-box">
+<p><strong>Colaborador:</strong> ${nomeColab}</p>
+<p><strong>Função:</strong> ${funcaoColab}</p>
+<p><strong>Setor:</strong> ${setorColab}</p>
+${solId ? `<p><strong>Solicitação:</strong> ${solId}</p>` : ''}
+${solId && solicitanteNome !== '—' ? `<p><strong>Encarregado:</strong> ${solicitanteNome}</p>` : ''}
+  <p><strong>Total de itens:</strong> ${itensAtend.length} tipo(s) · ${itensAtend.reduce((s, i) => s + (Number(i.quantidade) || 1), 0)} unidade(s)</p>
       </div>
 
       <table>
@@ -19155,9 +19638,17 @@ function imprimirFichaSeparacao() {
       </table>
 
       <div class="rodape">
-        <div class="assinatura">Responsável pela Separação</div>
-        <div class="assinatura">Conferente</div>
-      </div>
+  <div class="assinatura">
+    <div style="display:inline-block; border:2px solid #1a237e; border-radius:8px; padding:8px 16px; margin-bottom:8px; background:#f0f4ff; min-width:180px;">
+      <div style="font-size:9px; color:#1a237e; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">✦ Responsável pela Entrega ✦</div>
+      <div style="font-size:11px; font-weight:700; color:#000; margin-bottom:2px;">${usuarioLogado?.name || '—'}</div>
+      <div style="font-size:9px; color:#444; margin-bottom:2px;">Perfil: ${usuarioLogado?.role || '—'} | Base: ${usuarioLogado?.base || '—'}</div>
+      <div style="font-size:9px; color:#666;">GCA — Sistema de Almoxarifado</div>
+    </div>
+    <div style="border-top:1px solid #000; padding-top:6px; font-size:12px; color:#555;">Conferente</div>
+  </div>
+  <div class="assinatura" style="padding-top:60px;">Responsavel Pela Separação</div>
+</div>
 
       ${qrSection}
 
@@ -20242,6 +20733,229 @@ function exportarControleMedidoresExcel() {
     .enel_exportarControleMedidores();
 }
 
+
+function verItensPendencia(atendimentoId) {
+  const item = _pendenciasCache.find(i => i.id === atendimentoId);
+  if (!item) return;
+
+  const itens = item.itens || [];
+  const html = itens.length
+    ? itens.map(it => `
+        <div style="display:flex; justify-content:space-between; align-items:center;
+          padding:10px 14px; background:rgba(0,0,0,0.2); border-radius:10px; margin-bottom:8px;
+          border:1px solid rgba(255,255,255,0.04);">
+          <div>
+            <div style="font-weight:600; color:#e2e8f0; font-size:13px;">${it.descricao || it.nome || '—'}</div>
+            <div style="font-size:11px; color:#64748b; margin-top:2px;">${it.motivo || '—'}</div>
+          </div>
+          <span style="font-size:20px; font-weight:800; color:#00B8E6; margin-left:16px;">${it.quantidade}</span>
+        </div>`).join('')
+    : '<p style="color:#64748b; text-align:center; padding:20px;">Nenhum item encontrado.</p>';
+
+  document.getElementById('modalVerItensNome').textContent  = item.nomeColaborador;
+  document.getElementById('modalVerItensData').textContent  = item.data;
+  document.getElementById('modalVerItensLista').innerHTML   = html;
+  document.getElementById('modalVerItens').style.display    = 'flex';
+}
+
+     // ==================== ANÁLISE DE TROCAS ====================
+
+let _analiseTrocasCache = null;
+
+function definirPeriodoTroca(dias) {
+  const fim = new Date();
+  const ini = new Date();
+  if (dias > 0) ini.setDate(ini.getDate() - dias);
+  document.getElementById('trocaDataFim').value   = fim.toISOString().split('T')[0];
+  document.getElementById('trocaDataInicio').value = dias > 0 ? ini.toISOString().split('T')[0] : '';
+  carregarAnaliseTrocas();
+}
+
+function carregarAnaliseTrocas() {
+  const dataInicio = document.getElementById('trocaDataInicio')?.value || '';
+  const dataFim    = document.getElementById('trocaDataFim')?.value    || '';
+  const armazem    = document.getElementById('trocaArmazem')?.value    || '';
+  const colab      = document.getElementById('trocaColab')?.value      || '';
+  const item       = document.getElementById('trocaItem')?.value       || '';
+
+  document.getElementById('trocaLoading').style.display  = 'block';
+  document.getElementById('trocaConteudo').style.display = 'none';
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      document.getElementById('trocaLoading').style.display  = 'none';
+      document.getElementById('trocaConteudo').style.display = 'block';
+      if (!res || !res.sucesso) { console.error('Erro análise trocas:', res?.erro); return; }
+      _analiseTrocasCache = res;
+      renderizarAnaliseTrocas(res);
+    })
+    .withFailureHandler(function(e) {
+      document.getElementById('trocaLoading').style.display  = 'none';
+      document.getElementById('trocaConteudo').style.display = 'block';
+      console.error('Falha análise trocas:', e.message);
+    })
+    .obterAnaliseTrocas(dataInicio, dataFim, armazem, colab, item);
+}
+
+function renderizarAnaliseTrocas(res) {
+  const registros = res.registros || [];
+
+  // ── Cards resumo ──
+  const itensUnicos  = new Set(registros.map(r => r.itemId)).size;
+  const colabsUnicos = new Set(registros.map(r => r.colaboradorId)).size;
+  const totalAdiant  = registros.reduce((s, r) => s + Math.max(0, r.prazoMinDias - r.diasDecorridos), 0);
+  const mediaAdiant  = registros.length ? Math.round(totalAdiant / registros.length) : 0;
+  const totalEfic    = registros.reduce((s, r) => s + (r.prazoMinDias > 0 ? (r.diasDecorridos / r.prazoMinDias) * 100 : 0), 0);
+  const mediaEfic    = registros.length ? Math.round(totalEfic / registros.length) : 0;
+
+  document.getElementById('trocaTotal').textContent       = registros.length;
+  document.getElementById('trocaItensUnicos').textContent  = itensUnicos;
+  document.getElementById('trocaColabsUnicos').textContent = colabsUnicos;
+  document.getElementById('trocaMediaAdiant').textContent  = mediaAdiant + ' dias';
+  document.getElementById('trocaEficiencia').textContent   = mediaEfic + '%';
+  document.getElementById('trocaTotalRegistros').textContent = registros.length + ' registro(s)';
+
+  // ── Popula select de armazéns ──
+  const selArm = document.getElementById('trocaArmazem');
+  const valAtual = selArm.value;
+  selArm.innerHTML = '<option value="">Todos</option>';
+  (res.armazens || []).forEach(a => {
+    const opt = document.createElement('option');
+    opt.value = a; opt.textContent = a;
+    if (a === valAtual) opt.selected = true;
+    selArm.appendChild(opt);
+  });
+
+  // ── Gráfico top itens ──
+  const ctxItens = document.getElementById('chartTrocaItens');
+  if (ctxItens) {
+    if (ctxItens._chartInstance) ctxItens._chartInstance.destroy();
+    ctxItens._chartInstance = new Chart(ctxItens, {
+      type: 'bar',
+      data: {
+        labels: (res.rankingItens || []).slice(0,8).map(i => i.itemNome.length > 20 ? i.itemNome.substring(0,20)+'...' : i.itemNome),
+        datasets: [{ label: 'Trocas', data: (res.rankingItens || []).slice(0,8).map(i => i.total),
+          backgroundColor: 'rgba(239,68,68,0.7)', borderColor: '#ef4444', borderWidth: 1 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { ticks: { color:'#94a3b8', font:{size:10} } }, y: { ticks: { color:'#94a3b8' } } }
+      }
+    });
+  }
+
+  // ── Gráfico top colaboradores ──
+  const ctxColabs = document.getElementById('chartTrocaColabs');
+  if (ctxColabs) {
+    if (ctxColabs._chartInstance) ctxColabs._chartInstance.destroy();
+    ctxColabs._chartInstance = new Chart(ctxColabs, {
+      type: 'bar',
+      data: {
+        labels: (res.rankingColabs || []).slice(0,8).map(c => c.colaboradorNome.split(' ')[0]),
+        datasets: [{ label: 'Trocas', data: (res.rankingColabs || []).slice(0,8).map(c => c.total),
+          backgroundColor: 'rgba(168,85,247,0.7)', borderColor: '#a855f7', borderWidth: 1 }]
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { ticks: { color:'#94a3b8', font:{size:10} } }, y: { ticks: { color:'#94a3b8' } } }
+      }
+    });
+  }
+
+  // ── Gráfico evolução por mês ──
+  const ctxMes = document.getElementById('chartTrocaMes');
+  if (ctxMes) {
+    if (ctxMes._chartInstance) ctxMes._chartInstance.destroy();
+    const meses  = Object.keys(res.porMes || {}).sort();
+    const valores = meses.map(m => res.porMes[m]);
+    ctxMes._chartInstance = new Chart(ctxMes, {
+      type: 'line',
+      data: {
+        labels: meses,
+        datasets: [{ label: 'Trocas Precoces', data: valores,
+          borderColor: '#00B8E6', backgroundColor: 'rgba(0,184,230,0.1)',
+          fill: true, tension: 0.4, pointBackgroundColor: '#00B8E6' }]
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { labels: { color:'#94a3b8' } } },
+        scales: { x: { ticks: { color:'#94a3b8' } }, y: { ticks: { color:'#94a3b8' } } }
+      }
+    });
+  }
+
+  // ── Tabela durabilidade por item ──
+  const tbDur = document.getElementById('tbAnaliseDurabilidade');
+  if (tbDur) {
+    tbDur.innerHTML = (res.rankingItens || []).map(i => {
+      const efic    = i.prazo > 0 ? Math.round((i.mediaDias / i.prazo) * 100) : 0;
+      const cor     = efic >= 80 ? '#22c55e' : efic >= 50 ? '#f59e0b' : '#ef4444';
+      const avalia  = efic >= 80 ? '✅ Aceitável' : efic >= 50 ? '⚠️ Atenção' : '🚨 Crítico';
+      return `
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.05);">
+          <td style="padding:12px; color:#e2e8f0; font-size:13px;">${i.itemNome}</td>
+          <td style="padding:12px; text-align:center; font-weight:700; color:#ef4444;">${i.total}</td>
+          <td style="padding:12px; text-align:center; color:#94a3b8;">${i.prazo} dias</td>
+          <td style="padding:12px; text-align:center; color:#00B8E6; font-weight:700;">${i.mediaDias} dias</td>
+          <td style="padding:12px; text-align:center; font-weight:700; color:${cor};">${efic}%</td>
+          <td style="padding:12px; color:${cor}; font-weight:600;">${avalia}</td>
+        </tr>`;
+    }).join('') || '<tr><td colspan="6" style="padding:20px; text-align:center; color:#64748b;">Nenhum dado.</td></tr>';
+  }
+
+  // ── Tabela detalhada ──
+  const tbDet = document.getElementById('tbTrocasDetalhadas');
+  if (tbDet) {
+    tbDet.innerHTML = registros.map(r => {
+      const efic = r.prazoMinDias > 0 ? Math.round((r.diasDecorridos / r.prazoMinDias) * 100) : 0;
+      const cor  = efic >= 80 ? '#22c55e' : efic >= 50 ? '#f59e0b' : '#ef4444';
+      return `
+        <tr style="border-bottom:1px solid rgba(255,255,255,0.04);">
+          <td style="padding:10px 12px; color:#94a3b8; font-size:12px; white-space:nowrap;">${r.dataRegistro}</td>
+          <td style="padding:10px 12px; color:#e2e8f0; font-size:12px;">${r.colaboradorNome}</td>
+          <td style="padding:10px 12px; color:#e2e8f0; font-size:12px;">${r.itemNome}</td>
+          <td style="padding:10px 12px; text-align:center; color:#00B8E6; font-weight:700;">${r.diasDecorridos}d</td>
+          <td style="padding:10px 12px; text-align:center; color:#94a3b8;">${r.prazoMinDias}d</td>
+          <td style="padding:10px 12px; text-align:center; font-weight:700; color:${cor};">${efic}%</td>
+          <td style="padding:10px 12px; color:#94a3b8; font-size:12px;">${r.motivo}</td>
+          <td style="padding:10px 12px; color:#64748b; font-size:11px; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${r.justificativa}">${r.justificativa || '—'}</td>
+          <td style="padding:10px 12px;">
+            <span style="background:${r.origem === 'SOLICITACAO' ? 'rgba(0,184,230,0.15)' : 'rgba(168,85,247,0.15)'};
+              color:${r.origem === 'SOLICITACAO' ? '#00B8E6' : '#a855f7'};
+              border-radius:6px; padding:2px 8px; font-size:11px; font-weight:600;">
+              ${r.origem === 'SOLICITACAO' ? '📋 SC' : '🤝 ATD'}
+            </span>
+          </td>
+        </tr>`;
+    }).join('') || '<tr><td colspan="9" style="padding:20px; text-align:center; color:#64748b;">Nenhum registro encontrado.</td></tr>';
+  }
+}
+
+function exportarAnaliseTrocasCSV() {
+  if (!_analiseTrocasCache || !_analiseTrocasCache.registros.length) {
+    alert('Nenhum dado para exportar. Carregue os dados primeiro.');
+    return;
+  }
+
+  const header = ['Data','Colaborador','Item','Dias Durou','Prazo (dias)','Eficiência (%)','Motivo','Justificativa','Origem','Armazém'];
+  const linhas = _analiseTrocasCache.registros.map(r => {
+    const efic = r.prazoMinDias > 0 ? Math.round((r.diasDecorridos / r.prazoMinDias) * 100) : 0;
+    return [
+      r.dataRegistro, r.colaboradorNome, r.itemNome,
+      r.diasDecorridos, r.prazoMinDias, efic + '%',
+      r.motivo, r.justificativa || '', r.origem, r.armazemNome
+    ].map(v => '"' + String(v).replace(/"/g, '""') + '"').join(';');
+  });
+
+  const csv = 'sep=;\n' + '\uFEFF' + header.join(';') + '\n' + linhas.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'analise_trocas_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+ 
 </script>
 
 
