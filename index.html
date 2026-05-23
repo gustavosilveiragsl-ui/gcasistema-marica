@@ -3132,6 +3132,7 @@
           <option value="">Todos</option>
           <option value="ESTOQUE">📦 Estoque</option>
           <option value="COM_COLAB">👤 Com Colaborador</option>
+         <option value="AGUARDANDO_LAUDO">🔬 Aguardando Laudo</option>
         </select>
       </div>
 
@@ -11710,6 +11711,7 @@ function laudosRender_() {
     const totalSer  = seriais.length;
     const emEstoque = seriais.filter(s => s.statusLocal === 'ESTOQUE').length;
     const comColab  = seriais.filter(s => s.statusLocal === 'COM_COLAB').length;
+    const aguardLaudo  = seriais.filter(s => s.statusLocal === 'AGUARDANDO_LAUDO').length;
     const vencidos  = seriais.filter(s => s.status === 'VENCIDO').length;
     const alerta30  = seriais.filter(s => s.status === 'ALERTA_30').length;
     const semLaudo  = seriais.filter(s => s.status === 'SEM_LAUDO').length;
@@ -11761,7 +11763,7 @@ function laudosRender_() {
         </span>
       </td>
       <td style="padding:14px; text-align:center; font-size:12px; color:#94a3b8;">
-        📦 ${emEstoque} estoque &nbsp;·&nbsp; 👤 ${comColab} colaborador
+        📦 ${emEstoque} estoque &nbsp;·&nbsp; 👤 ${comColab} colaborador${aguardLaudo > 0 ? ` &nbsp;·&nbsp; 🔬 ${aguardLaudo} aguard. laudo` : ''}
       </td>
       <td style="padding:14px;" colspan="2">${badgeGrupo}</td>
       <td style="padding:14px;" colspan="2">
@@ -11797,6 +11799,8 @@ function laudosRender_() {
             ${seriais.map(x => {
               const localTxt = x.statusLocal === 'COM_COLAB'
                 ? `👤 ${x.nomeColab || 'Colaborador'}`
+               : x.statusLocal === 'AGUARDANDO_LAUDO'
+                ? '🔬 Aguardando Laudo'
                 : '📦 Estoque';
               const venc = fmtDateBr_(x.dataVenc);
               const dias = (x.diasRest === '' || x.diasRest === null || typeof x.diasRest === 'undefined') ? '—' : String(x.diasRest);
