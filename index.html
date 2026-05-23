@@ -9410,6 +9410,12 @@ window.__setSerialDescarte = function(itemIdx, serialIdx, valor) {
 
   google.script.run
     .withSuccessHandler(function(res) {
+      if (res.duplicata) {
+        console.warn('⚠️ Duplicata bloqueada:', registro.id);
+        loadingEl.style.display = 'none';
+        if (btnFinalizar) btnFinalizar.disabled = false;
+        return;
+      }
       if (res.sucesso) {
         msg.style.color = '#22c55e';
         msg.textContent = '✓ Atendimento finalizado com sucesso!';
