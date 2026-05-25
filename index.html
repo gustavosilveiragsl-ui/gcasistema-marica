@@ -19217,13 +19217,16 @@ function atenderSolicitacaoGestao() {
 
   // Mapa de conversão de motivos
   const motivoMap = {
-    'Entrega inicial':      'entrega inicial',
-    'Reposição':            'Reposição',
-    'Desgastado':           'troca descarte',
-    'Avariado por mau uso': 'troca descarte',
-    'Perdido':              'perca',
-    'Roubado':              'roubo'
-  };
+  'Entrega inicial':      'entrega inicial',
+  'Reposição':            'Reposição',
+  'Desgastado':           'troca descarte',
+  'Avariado por mau uso': 'troca descarte',
+  'Perdido':              'perca',
+  'Roubado':              'roubo',
+  'Troca por laudo':      'troca recuperação'
+};
+
+const motivoConvertido = motivoMap[motivoBase] || 'entrega inicial';
 
   // Fecha o modal
   document.getElementById('modalGestSol').style.display = 'none';
