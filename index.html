@@ -19226,8 +19226,7 @@ function atenderSolicitacaoGestao() {
   'Troca por laudo':      'troca recuperação'
 };
 
-const motivoConvertido = motivoMap[motivoBase] || 'entrega inicial';
-
+ 
   // Fecha o modal
   document.getElementById('modalGestSol').style.display = 'none';
 
@@ -19295,7 +19294,7 @@ const motivoConvertido = motivoMap[motivoBase] || 'entrega inicial';
 
             const motivoOriginal   = it.motivo || 'Reposição';
             const motivoBase       = motivoOriginal.split(' — Justificativa:')[0].trim();
-            const motivoConvertido = motivoMap[motivoBase] || 'Reposição';
+            const motivoConvertido = motivoMap[motivoBase] || 'entrega inicial';
 
             _finalizarAdicionarItem(itemLocal, armLocal, Number(it.quantidade) || 1, motivoConvertido);
             setTimeout(adicionarProximoItem, 100);
