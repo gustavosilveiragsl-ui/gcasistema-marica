@@ -1368,60 +1368,108 @@
 </section>
 
        <section class="view hidden" id="view-laudos-viaturas">
-<div style="padding:20px; max-width:900px; margin:0 auto;">
+<div style="padding:24px 28px 28px 28px; max-width:1200px;">
 
-  <!-- Sub-tabs -->
-  <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
-    <button id="tabLaudos" onclick="mudarTabLaudos('lista')"
-      style="display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;border:1px solid rgba(0,184,230,0.4);background:rgba(0,184,230,0.15);color:#00B8E6;font-size:14px;font-weight:600;cursor:pointer;">
-      🚗 Laudos
-    </button>
-    <button id="tabLaudosConfig" onclick="mudarTabLaudos('config')"
-      style="display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;border:1px solid rgba(148,163,184,0.15);background:rgba(255,255,255,0.03);color:#64748b;font-size:14px;font-weight:600;cursor:pointer;">
-      ⚙️ Configurações
-    </button>
-    <button onclick="abrirModalLaudo(null)"
-      style="margin-left:auto;display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,#00B8E6,#0369a1);color:#fff;font-size:14px;font-weight:700;cursor:pointer;">
-      ➕ Cadastrar Laudo
-    </button>
-  </div>
-
-  <!-- ── LISTA DE LAUDOS ── -->
-  <div id="painelLaudosLista">
-
-    <!-- Filtros rápidos -->
-    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-      <button onclick="filtrarLaudos('TODOS')"  id="fLaudoTodos"  class="filtro-laudo ativo-laudo" style="padding:7px 16px;border-radius:20px;border:1px solid rgba(0,184,230,0.4);background:rgba(0,184,230,0.15);color:#00B8E6;font-size:12px;font-weight:700;cursor:pointer;">Todos</button>
-      <button onclick="filtrarLaudos('VENCIDO')" id="fLaudoVenc"  class="filtro-laudo" style="padding:7px 16px;border-radius:20px;border:1px solid rgba(239,68,68,0.3);background:transparent;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;">🔴 Vencidos</button>
-      <button onclick="filtrarLaudos('ALERTA')"  id="fLaudoAler"  class="filtro-laudo" style="padding:7px 16px;border-radius:20px;border:1px solid rgba(245,158,11,0.3);background:transparent;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;">🟡 Vencendo</button>
-      <button onclick="filtrarLaudos('OK')"      id="fLaudoOk"    class="filtro-laudo" style="padding:7px 16px;border-radius:20px;border:1px solid rgba(34,197,94,0.3);background:transparent;color:#64748b;font-size:12px;font-weight:700;cursor:pointer;">🟢 OK</button>
+  <!-- Header -->
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+    <div>
+      <h2 style="font-size:22px;font-weight:800;color:#fff;margin:0;">Laudos de Viaturas 🚗</h2>
+      <p style="color:#64748b;font-size:13px;margin:4px 0 0;">Controle de vencimento por placa · agrupado por viatura</p>
     </div>
-
-    <div id="laudosListaEl">
-      <div style="text-align:center;padding:40px;color:#64748b;font-size:13px;">Carregando...</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button onclick="mostrarTabLaudos('config')" id="btnLaudosConfigTab"
+        style="background:rgba(71,85,105,0.3);border:1px solid rgba(148,163,184,0.2);border-radius:10px;padding:9px 18px;color:#94a3b8;font-size:13px;font-weight:600;cursor:pointer;">
+        ⚙️ Configurações
+      </button>
+      <button onclick="mostrarTabLaudos('lista')" id="btnLaudosListaTab"
+        style="display:none;background:rgba(71,85,105,0.3);border:1px solid rgba(148,163,184,0.2);border-radius:10px;padding:9px 18px;color:#94a3b8;font-size:13px;font-weight:600;cursor:pointer;">
+        🚗 Laudos
+      </button>
+      <button onclick="abrirModalLaudo(null)"
+        style="background:linear-gradient(135deg,#00B8E6,#0369a1);border:none;border-radius:10px;padding:9px 20px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;">
+        ➕ Novo Laudo
+      </button>
     </div>
   </div>
 
-  <!-- ── CONFIGURAÇÕES ── -->
+  <!-- ── PAINEL PRINCIPAL ── -->
+  <div id="painelLaudosPrincipal">
+
+    <!-- Cards resumo -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:20px;">
+      <div style="background:rgba(15,23,42,0.8);border:1px solid rgba(0,184,230,0.4);border-radius:12px;padding:16px 20px;text-align:center;">
+        <div id="lvTotalPlacas" style="font-size:36px;font-weight:900;color:#00B8E6;line-height:1;">0</div>
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:6px;">Total Placas</div>
+      </div>
+      <div style="background:rgba(15,23,42,0.8);border:1px solid rgba(34,197,94,0.4);border-radius:12px;padding:16px 20px;text-align:center;">
+        <div id="lvCountOK" style="font-size:36px;font-weight:900;color:#22c55e;line-height:1;">0</div>
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:6px;">OK</div>
+      </div>
+      <div style="background:rgba(15,23,42,0.8);border:1px solid rgba(245,158,11,0.4);border-radius:12px;padding:16px 20px;text-align:center;">
+        <div id="lvCountAlerta" style="font-size:36px;font-weight:900;color:#f59e0b;line-height:1;">0</div>
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:6px;">Alerta</div>
+      </div>
+      <div style="background:rgba(15,23,42,0.8);border:1px solid rgba(239,68,68,0.4);border-radius:12px;padding:16px 20px;text-align:center;">
+        <div id="lvCountVencido" style="font-size:36px;font-weight:900;color:#ef4444;line-height:1;">0</div>
+        <div style="font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-top:6px;">Vencidos</div>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+      <input id="lvBusca" placeholder="🔍 Buscar placa..." oninput="renderLaudosAgrupados()"
+        style="background:rgba(15,23,42,0.8);border:1.5px solid rgba(148,163,184,0.2);border-radius:10px;padding:10px 14px;color:#fff;font-size:13px;width:200px;">
+      <select id="lvFiltroStatus" onchange="renderLaudosAgrupados()"
+        style="background:rgba(15,23,42,0.8);border:1.5px solid rgba(148,163,184,0.2);border-radius:10px;padding:10px 14px;color:#fff;font-size:13px;">
+        <option value="">Todos os status</option>
+        <option value="VENCIDO">🔴 Vencidos</option>
+        <option value="ALERTA">🟡 Vencendo</option>
+        <option value="OK">🟢 OK</option>
+      </select>
+      <button onclick="carregarLaudosViaturas()"
+        style="background:rgba(71,85,105,0.2);border:1px solid rgba(148,163,184,0.15);border-radius:10px;padding:10px 16px;color:#94a3b8;font-size:13px;cursor:pointer;">
+        🔄 Recarregar
+      </button>
+    </div>
+
+    <!-- Tabela -->
+    <div style="background:rgba(15,23,42,0.6);border:1px solid rgba(148,163,184,0.1);border-radius:14px;overflow:hidden;">
+      <!-- Header tabela -->
+      <div style="display:grid;grid-template-columns:36px 1fr 100px 160px 140px 130px;padding:10px 16px;border-bottom:1px solid rgba(148,163,184,0.12);background:rgba(0,0,0,0.2);">
+        <div></div>
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Placa</div>
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Laudos</div>
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Próx. Vencimento</div>
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Status</div>
+        <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;">Ações</div>
+      </div>
+      <div id="laudosListaEl">
+        <div style="text-align:center;padding:40px;color:#64748b;font-size:13px;">Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PAINEL CONFIG ── -->
   <div id="painelLaudosConfig" style="display:none;">
-    <div style="background:rgba(17,24,39,0.85);border:1px solid rgba(148,163,184,0.1);border-radius:18px;padding:22px 26px;">
-      <div style="font-size:10px;font-weight:700;color:#00B8E6;text-transform:uppercase;letter-spacing:2px;margin-bottom:18px;display:flex;align-items:center;gap:8px;">
-        📧 Configuração de Alertas
+    <div style="background:rgba(17,24,39,0.85);border:1px solid rgba(148,163,184,0.1);border-radius:18px;padding:24px 28px;">
+      <div style="font-size:10px;font-weight:700;color:#00B8E6;text-transform:uppercase;letter-spacing:2px;margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+        📧 Configuração de Alertas de Email
         <span style="flex:1;height:1px;background:linear-gradient(to right,rgba(0,184,230,0.3),transparent);display:block;"></span>
       </div>
-
       <div style="margin-bottom:16px;">
-        <label style="font-size:12px;font-weight:600;color:#94a3b8;display:block;margin-bottom:6px;text-transform:uppercase;">Emails para Alerta <span style="color:#64748b;font-weight:400;text-transform:none;">(separados por vírgula)</span></label>
-        <textarea id="laudoConfigEmails" rows="3" placeholder="email1@empresa.com, email2@empresa.com, ..."
+        <label style="font-size:12px;font-weight:600;color:#94a3b8;display:block;margin-bottom:6px;text-transform:uppercase;">
+          Emails para receber alertas <span style="color:#64748b;text-transform:none;font-weight:400;">(separados por vírgula)</span>
+        </label>
+        <textarea id="laudoConfigEmails" rows="3" placeholder="email1@ceneged.com, email2@ceneged.com..."
           style="width:100%;background:rgba(7,13,26,0.8);border:1.5px solid rgba(148,163,184,0.15);border-radius:10px;padding:12px 14px;color:#fff;font-size:13px;resize:vertical;"></textarea>
       </div>
-
-      <div style="margin-bottom:20px;">
-        <label style="font-size:12px;font-weight:600;color:#94a3b8;display:block;margin-bottom:6px;text-transform:uppercase;">Alertar quantos dias antes do vencimento?</label>
+      <div style="margin-bottom:22px;">
+        <label style="font-size:12px;font-weight:600;color:#94a3b8;display:block;margin-bottom:6px;text-transform:uppercase;">
+          Alertar quantos dias antes do vencimento?
+        </label>
         <input id="laudoConfigDias" type="number" min="1" max="180" placeholder="30"
-          style="width:200px;background:rgba(7,13,26,0.8);border:1.5px solid rgba(148,163,184,0.15);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;">
+          style="width:180px;background:rgba(7,13,26,0.8);border:1.5px solid rgba(148,163,184,0.15);border-radius:10px;padding:12px 14px;color:#fff;font-size:14px;">
       </div>
-
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button onclick="salvarConfigLaudos()"
           style="background:linear-gradient(135deg,#00B8E6,#0369a1);border:none;border-radius:10px;padding:12px 28px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;">
@@ -1429,10 +1477,10 @@
         </button>
         <button onclick="testarEmailLaudos()"
           style="background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.3);border-radius:10px;padding:12px 24px;color:#22c55e;font-size:14px;font-weight:600;cursor:pointer;">
-          📧 Testar Envio de Email
+          📧 Testar Envio
         </button>
       </div>
-      <div id="laudoConfigMsg" style="margin-top:12px;font-size:13px;min-height:16px;"></div>
+      <div id="laudoConfigMsg" style="margin-top:14px;font-size:13px;min-height:16px;"></div>
     </div>
   </div>
 
@@ -20742,103 +20790,161 @@ function iniciarAtendimentoMobilizacao() {
 // ══════════════════════════════════════════
 //  LAUDOS VIATURAS
 // ══════════════════════════════════════════
+var _laudosTodos = [];
+var _laudosExpand = {};
 
-var _laudosTodos  = [];
-var _laudoFiltro  = 'TODOS';
-
-function mudarTabLaudos(aba) {
-  document.getElementById('painelLaudosLista').style.display  = aba==='lista'  ? 'block' : 'none';
-  document.getElementById('painelLaudosConfig').style.display = aba==='config' ? 'block' : 'none';
-  var estilo = { ativo:'border:1px solid rgba(0,184,230,0.4);background:rgba(0,184,230,0.15);color:#00B8E6;',
-                 inativo:'border:1px solid rgba(148,163,184,0.15);background:rgba(255,255,255,0.03);color:#64748b;' };
-  document.getElementById('tabLaudos').style.cssText       += aba==='lista'  ? estilo.ativo : estilo.inativo;
-  document.getElementById('tabLaudosConfig').style.cssText += aba==='config' ? estilo.ativo : estilo.inativo;
+function mostrarTabLaudos(aba) {
+  document.getElementById('painelLaudosPrincipal').style.display = aba==='lista'  ? 'block' : 'none';
+  document.getElementById('painelLaudosConfig').style.display    = aba==='config' ? 'block' : 'none';
+  document.getElementById('btnLaudosConfigTab').style.display    = aba==='lista'  ? 'inline-flex' : 'none';
+  document.getElementById('btnLaudosListaTab').style.display     = aba==='config' ? 'inline-flex' : 'none';
   if (aba==='config') carregarConfigLaudos();
 }
 
-// ── Carregar lista ──
 function carregarLaudosViaturas() {
   document.getElementById('laudosListaEl').innerHTML =
-    '<div style="text-align:center;padding:40px;color:#00B8E6;font-size:14px;">⏳ Carregando...</div>';
+    '<div style="text-align:center;padding:40px;color:#00B8E6;font-size:14px;">⏳ Carregando laudos...</div>';
   google.script.run
     .withSuccessHandler(function(res) {
-      if (!res.sucesso) { document.getElementById('laudosListaEl').innerHTML='<p style="color:#ef4444;text-align:center;padding:30px;">Erro ao carregar.</p>'; return; }
+      if (!res.sucesso) {
+        document.getElementById('laudosListaEl').innerHTML =
+          '<div style="text-align:center;padding:40px;color:#ef4444;font-size:13px;">❌ Erro: ' + (res.erro||'desconhecido') + '</div>';
+        return;
+      }
       _laudosTodos = res.lista || [];
-      renderLaudos();
+      atualizarCardsLaudos();
+      renderLaudosAgrupados();
     })
     .withFailureHandler(function(err) {
-      document.getElementById('laudosListaEl').innerHTML='<p style="color:#ef4444;text-align:center;padding:30px;">Erro: '+err.message+'</p>';
+      document.getElementById('laudosListaEl').innerHTML =
+        '<div style="text-align:center;padding:40px;color:#ef4444;font-size:13px;">❌ Erro de conexão: ' + err.message + '</div>';
     })
     .listarLaudosViaturas();
 }
 
-function filtrarLaudos(status) {
-  _laudoFiltro = status;
-  ['TODOS','VENCIDO','ALERTA','OK'].forEach(function(s){
-    var btn = document.getElementById('fLaudo'+(s==='TODOS'?'Todos':s==='VENCIDO'?'Venc':s==='ALERTA'?'Aler':'Ok'));
-    if (!btn) return;
-    var cores = { TODOS:'rgba(0,184,230', VENCIDO:'rgba(239,68,68', ALERTA:'rgba(245,158,11', OK:'rgba(34,197,94' };
-    var c = cores[s] || 'rgba(0,184,230';
-    if (s===status) {
-      btn.style.background = c+',0.15)'; btn.style.borderColor = c+',0.5)';
-      btn.style.color = s==='TODOS'?'#00B8E6':s==='VENCIDO'?'#ef4444':s==='ALERTA'?'#f59e0b':'#22c55e';
-    } else {
-      btn.style.background = 'transparent';
-      btn.style.color = '#64748b';
-    }
+function atualizarCardsLaudos() {
+  var placas  = {};
+  _laudosTodos.forEach(function(l){ if (!placas[l.placa]) placas[l.placa] = []; placas[l.placa].push(l); });
+  var totalOK = 0, totalAl = 0, totalVenc = 0;
+  _laudosTodos.forEach(function(l){
+    if (l.status==='OK')      totalOK++;
+    else if (l.status==='ALERTA')  totalAl++;
+    else if (l.status==='VENCIDO') totalVenc++;
   });
-  renderLaudos();
+  document.getElementById('lvTotalPlacas').textContent  = Object.keys(placas).length;
+  document.getElementById('lvCountOK').textContent      = totalOK;
+  document.getElementById('lvCountAlerta').textContent  = totalAl;
+  document.getElementById('lvCountVencido').textContent = totalVenc;
 }
 
-function renderLaudos() {
-  var el = document.getElementById('laudosListaEl');
-  var lista = _laudoFiltro==='TODOS' ? _laudosTodos : _laudosTodos.filter(function(l){ return l.status===_laudoFiltro; });
-  if (!lista.length) {
-    el.innerHTML='<div style="text-align:center;padding:40px;color:#64748b;font-size:13px;">Nenhum laudo encontrado.</div>'; return;
+function renderLaudosAgrupados() {
+  var el      = document.getElementById('laudosListaEl');
+  var busca   = (document.getElementById('lvBusca').value||'').trim().toLowerCase();
+  var filtSt  = document.getElementById('lvFiltroStatus').value;
+
+  // Agrupa por placa
+  var grupos = {};
+  _laudosTodos.forEach(function(l) {
+    if (busca && !l.placa.toLowerCase().includes(busca)) return;
+    if (filtSt && l.status !== filtSt) return;
+    if (!grupos[l.placa]) grupos[l.placa] = [];
+    grupos[l.placa].push(l);
+  });
+
+  var placas = Object.keys(grupos);
+  if (!placas.length) {
+    el.innerHTML = '<div style="text-align:center;padding:40px;color:#64748b;font-size:13px;">Nenhuma viatura encontrada.</div>';
+    return;
   }
 
-  var badgeMap = {
+  var badgeCSS = {
     'VENCIDO':'background:rgba(239,68,68,0.18);color:#ef4444;border:1px solid rgba(239,68,68,0.35);',
     'ALERTA' :'background:rgba(245,158,11,0.18);color:#f59e0b;border:1px solid rgba(245,158,11,0.35);',
     'OK'     :'background:rgba(34,197,94,0.18);color:#22c55e;border:1px solid rgba(34,197,94,0.35);'
   };
   var iconeMap = { VENCIDO:'🔴', ALERTA:'🟡', OK:'🟢' };
   var labelMap = { VENCIDO:'Vencido', ALERTA:'Vencendo', OK:'OK' };
+  var ordem    = { VENCIDO:0, ALERTA:1, OK:2 };
 
-  el.innerHTML = lista.map(function(l){
-    var badge  = badgeMap[l.status]||'';
-    var icone  = iconeMap[l.status]||'⚪';
-    var label  = labelMap[l.status]||l.status;
-    var infoD  = l.status==='VENCIDO'
-      ? '🔴 Venceu há <strong>'+Math.abs(l.diasRestantes)+'</strong> dia(s)'
-      : l.status==='ALERTA'
-      ? '🟡 Vence em <strong>'+l.diasRestantes+'</strong> dia(s)'
-      : '🟢 <strong>'+l.diasRestantes+'</strong> dia(s) restantes';
-    var borda  = l.status==='VENCIDO' ? 'border-left:3px solid #ef4444;' : l.status==='ALERTA' ? 'border-left:3px solid #f59e0b;' : '';
+  var html = '';
+  placas.forEach(function(placa) {
+    var laudos = grupos[placa];
+    // Pior status do grupo
+    laudos.sort(function(a,b){ return (ordem[a.status]||9)-(ordem[b.status]||9); });
+    var piorStatus = laudos[0].status;
+    var expandido  = !!_laudosExpand[placa];
 
-    return '<div style="background:rgba(17,24,39,0.85);border:1px solid rgba(148,163,184,0.1);'+borda+'border-radius:16px;padding:16px 20px;margin-bottom:12px;">'
-      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">'
-      +'<div style="flex:1;">'
-      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;">'
-      +'<span style="font-size:18px;font-weight:900;color:#e2e8f0;font-family:monospace;">'+l.placa+'</span>'
-      +'<span style="'+badge+'border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;">'+icone+' '+label+'</span>'
-      +'</div>'
-      +'<div style="font-size:13px;color:#94a3b8;margin-bottom:4px;">📋 '+l.tipoLaudo+'</div>'
-      +'<div style="font-size:12px;color:#64748b;">📅 Vencimento: <strong style="color:#e2e8f0;">'+l.dataVencimento+'</strong> · '+infoD+'</div>'
-      +'</div>'
-      +'<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">'
-      +(l.linkPDF?'<a href="'+l.linkPDF+'" target="_blank" style="background:rgba(0,184,230,0.12);border:1px solid rgba(0,184,230,0.3);border-radius:8px;padding:6px 14px;color:#00B8E6;font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;">📄 PDF</a>':'')
-      +'<button onclick="abrirModalLaudo(\''+l.id+'\')" style="background:rgba(71,85,105,0.2);border:1px solid rgba(148,163,184,0.2);border-radius:8px;padding:6px 14px;color:#94a3b8;font-size:12px;cursor:pointer;white-space:nowrap;">✏️ Editar</button>'
-      +'<button onclick="excluirLaudo(\''+l.id+'\',\''+l.placa+'\')" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:8px;padding:6px 14px;color:#ef4444;font-size:12px;cursor:pointer;white-space:nowrap;">🗑️ Excluir</button>'
-      +'</div></div></div>';
-  }).join('');
+    // Próximo vencimento
+    var proxVenc = laudos.slice().sort(function(a,b){ return a.diasRestantes - b.diasRestantes; })[0];
+    var proxInfo = proxVenc.status === 'VENCIDO'
+      ? '<span style="color:#ef4444;">Venceu '+Math.abs(proxVenc.diasRestantes)+'d atrás</span>'
+      : '<span style="color:'+(proxVenc.status==='ALERTA'?'#f59e0b':'#22c55e')+';">'+proxVenc.diasRestantes+' dia(s)</span>';
+
+    var bordaEsq = piorStatus==='VENCIDO' ? 'border-left:3px solid #ef4444;' : piorStatus==='ALERTA' ? 'border-left:3px solid #f59e0b;' : '';
+
+    // Linha da placa
+    html += '<div style="'+bordaEsq+'border-bottom:1px solid rgba(148,163,184,0.08);">';
+    html += '<div style="display:grid;grid-template-columns:36px 1fr 100px 160px 140px 130px;padding:13px 16px;align-items:center;cursor:pointer;transition:background 0.15s;" '
+      + 'onmouseover="this.style.background=\'rgba(0,184,230,0.04)\'" onmouseout="this.style.background=\'\'" '
+      + 'onclick="toggleLaudoPlaca(\''+placa+'\')">'
+
+      + '<div style="color:#64748b;font-size:13px;transition:transform 0.2s;" id="seta_'+placa.replace(/[^a-zA-Z0-9]/g,'_')+'">'
+      + (expandido?'▼':'►')+'</div>'
+
+      + '<div style="font-weight:800;font-size:14px;color:#e2e8f0;font-family:monospace;letter-spacing:1px;">'+placa+'</div>'
+
+      + '<div style="font-size:12px;color:#94a3b8;">'
+      + '<span style="background:rgba(0,184,230,0.15);color:#00B8E6;border:1px solid rgba(0,184,230,0.3);border-radius:20px;padding:2px 10px;font-weight:700;">'+laudos.length+' laudo(s)</span>'
+      + '</div>'
+
+      + '<div style="font-size:12px;">'+proxInfo+'<br><span style="color:#64748b;font-size:11px;">'+proxVenc.dataVencimento+'</span></div>'
+
+      + '<div><span style="'+badgeCSS[piorStatus]+'border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;">'+iconeMap[piorStatus]+' '+labelMap[piorStatus]+'</span></div>'
+
+      + '<div onclick="event.stopPropagation();">'
+      + '<button onclick="abrirModalLaudo(null,\''+placa+'\')" title="Novo laudo para esta placa" '
+      + 'style="background:rgba(0,184,230,0.12);border:1px solid rgba(0,184,230,0.25);border-radius:7px;padding:5px 10px;color:#00B8E6;font-size:11px;cursor:pointer;">+ Laudo</button>'
+      + '</div>'
+
+      + '</div>';
+
+    // Laudos expandidos
+    if (expandido) {
+      html += '<div style="background:rgba(0,0,0,0.15);padding:0 16px 10px 52px;">';
+      laudos.forEach(function(l) {
+        var infoD = l.status==='VENCIDO'
+          ? '🔴 Venceu há '+Math.abs(l.diasRestantes)+'d'
+          : l.status==='ALERTA' ? '🟡 '+l.diasRestantes+'d restantes' : '🟢 '+l.diasRestantes+'d restantes';
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:rgba(255,255,255,0.02);border:1px solid rgba(148,163,184,0.08);border-radius:9px;margin-bottom:6px;gap:12px;flex-wrap:wrap;">'
+          +'<div style="flex:1;">'
+          +'<div style="font-size:13px;font-weight:600;color:#e2e8f0;">'+l.tipoLaudo+'</div>'
+          +'<div style="font-size:11px;color:#64748b;margin-top:2px;">📅 '+l.dataVencimento+' · '+infoD+'</div>'
+          +'</div>'
+          +'<div style="display:flex;gap:6px;align-items:center;">'
+          +(l.linkPDF?'<a href="'+l.linkPDF+'" target="_blank" style="background:rgba(0,184,230,0.1);border:1px solid rgba(0,184,230,0.25);border-radius:7px;padding:5px 12px;color:#00B8E6;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;">📄 PDF</a>':'')
+          +'<button onclick="abrirModalLaudo(\''+l.id+'\')" style="background:rgba(71,85,105,0.2);border:1px solid rgba(148,163,184,0.15);border-radius:7px;padding:5px 10px;color:#94a3b8;font-size:11px;cursor:pointer;">✏️</button>'
+          +'<button onclick="excluirLaudo(\''+l.id+'\',\''+l.placa+'\')" style="background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);border-radius:7px;padding:5px 10px;color:#ef4444;font-size:11px;cursor:pointer;">🗑️</button>'
+          +'</div></div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+  });
+
+  el.innerHTML = html;
+}
+
+function toggleLaudoPlaca(placa) {
+  _laudosExpand[placa] = !_laudosExpand[placa];
+  renderLaudosAgrupados();
 }
 
 // ── Modal ──
-function abrirModalLaudo(id) {
-  document.getElementById('laudoEditId').value     = id||'';
+function abrirModalLaudo(id, placaPreenchida) {
+  document.getElementById('laudoEditId').value         = id||'';
   document.getElementById('laudoModalMsg').textContent = '';
-  document.getElementById('modalLaudoTitulo').textContent = id ? '✏️ Editar Laudo' : '➕ Cadastrar Laudo';
+  document.getElementById('modalLaudoTitulo').textContent = id ? '✏️ Editar Laudo' : '➕ Novo Laudo';
 
   if (id) {
     var l = _laudosTodos.find(function(x){ return x.id===id; });
@@ -20847,12 +20953,11 @@ function abrirModalLaudo(id) {
       document.getElementById('laudoTipo').value       = l.tipoLaudo||'';
       document.getElementById('laudoDiasAlerta').value = l.diasAlerta||30;
       document.getElementById('laudoLink').value       = l.linkPDF||'';
-      // Convert DD/MM/YYYY to YYYY-MM-DD for input[type=date]
       var p = (l.dataVencimento||'').split('/');
       document.getElementById('laudoVencimento').value = p.length===3 ? p[2]+'-'+p[1]+'-'+p[0] : '';
     }
   } else {
-    document.getElementById('laudoPlaca').value      = '';
+    document.getElementById('laudoPlaca').value      = placaPreenchida||'';
     document.getElementById('laudoTipo').value       = '';
     document.getElementById('laudoVencimento').value = '';
     document.getElementById('laudoDiasAlerta').value = '30';
@@ -20868,7 +20973,7 @@ function fecharModalLaudo() {
 function salvarLaudo() {
   var placa = document.getElementById('laudoPlaca').value.trim().toUpperCase();
   var tipo  = document.getElementById('laudoTipo').value.trim();
-  var venc  = document.getElementById('laudoVencimento').value; // YYYY-MM-DD
+  var venc  = document.getElementById('laudoVencimento').value;
   var dias  = parseInt(document.getElementById('laudoDiasAlerta').value)||30;
   var link  = document.getElementById('laudoLink').value.trim();
   var id    = document.getElementById('laudoEditId').value;
@@ -20878,12 +20983,12 @@ function salvarLaudo() {
   if (!tipo)  { msg.style.color='#ef4444'; msg.textContent='Informe o tipo de laudo.'; return; }
   if (!venc)  { msg.style.color='#ef4444'; msg.textContent='Informe a data de vencimento.'; return; }
 
-  // Convert YYYY-MM-DD to DD/MM/YYYY
   var p = venc.split('-');
   var dataFmt = p[2]+'/'+p[1]+'/'+p[0];
 
   var btn = document.getElementById('btnSalvarLaudo');
   btn.disabled=true; btn.textContent='⏳ Salvando...';
+  msg.textContent = '';
 
   google.script.run
     .withSuccessHandler(function(res) {
@@ -20898,11 +21003,11 @@ function salvarLaudo() {
     })
     .salvarLaudoViatura({ id:id||null, placa, tipoLaudo:tipo, linkPDF:link,
                           dataVencimento:dataFmt, diasAlerta:dias,
-                          criadoPor: getUsuarioLogado ? getUsuarioLogado() : 'Sistema' });
+                          criadoPor: typeof getUsuarioLogado==='function' ? getUsuarioLogado() : 'Sistema' });
 }
 
 function excluirLaudo(id, placa) {
-  if (!confirm('Excluir o laudo da viatura '+placa+'?')) return;
+  if (!confirm('Excluir laudo da viatura '+placa+'?')) return;
   google.script.run
     .withSuccessHandler(function(res) {
       if (res.sucesso) carregarLaudosViaturas();
@@ -20929,12 +21034,11 @@ function salvarConfigLaudos() {
   var dias   = parseInt(document.getElementById('laudoConfigDias').value)||30;
   var msg    = document.getElementById('laudoConfigMsg');
   if (!emails) { msg.style.color='#ef4444'; msg.textContent='Informe pelo menos um email.'; return; }
-
   google.script.run
     .withSuccessHandler(function(res) {
       msg.style.color = res.sucesso ? '#22c55e' : '#ef4444';
       msg.textContent = res.sucesso ? '✅ Configurações salvas!' : 'Erro: '+res.erro;
-      setTimeout(function(){ msg.textContent=''; },3000);
+      setTimeout(function(){ msg.textContent=''; }, 3000);
     })
     .withFailureHandler(function(err){ msg.style.color='#ef4444'; msg.textContent='Erro: '+err.message; })
     .salvarConfigAlertasLaudos({ emails, diasAlertaGlobal: dias });
@@ -20945,9 +21049,9 @@ function testarEmailLaudos() {
   msg.style.color='#00B8E6'; msg.textContent='📧 Enviando email de teste...';
   google.script.run
     .withSuccessHandler(function(res) {
-      msg.style.color = res.sucesso ? '#22c55e' : '#ef4444';
-      msg.textContent = res.sucesso ? '✅ Email enviado com sucesso!' : 'Nenhum alerta pendente ou erro: '+(res.erro||'');
-      setTimeout(function(){ msg.textContent=''; },4000);
+      msg.style.color = res.sucesso ? '#22c55e' : '#f59e0b';
+      msg.textContent = res.sucesso ? '✅ Email enviado!' : '⚠️ Nenhum alerta pendente no momento.';
+      setTimeout(function(){ msg.textContent=''; }, 4000);
     })
     .withFailureHandler(function(err){ msg.style.color='#ef4444'; msg.textContent='Erro: '+err.message; })
     .verificarVencimentosLaudos();
