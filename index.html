@@ -599,7 +599,7 @@
                 <li><button data-view="consulta-colaboradores">👨🏻‍⚖️ Consulta de Colaboradores</button></li>
                 <li><button data-view="consulta-estoque">🧮 Consulta de Estoque</button></li>
                 <li><button data-view="consulta-dotacao">🧰 Consulta de Dotação Função</button></li>
-               <li><button data-view="view-descontos-materiais">💰 Descontos Materiais</button></li>
+               <li><button data-view="descontos-materiais">💰 Descontos Materiais</button></li>
               </ul>
             </li>
 
@@ -1184,7 +1184,7 @@
 </section>
 
 
-<section class="view hidden" id="view-descontos-materiais">
+<section class="view hidden" id="descontos-materiais">
   <!-- ══ SEÇÃO: DESCONTOS MATERIAIS ══ -->
 <div id="secaoDescontos" style="display:none; padding:20px; max-width:880px; margin:0 auto;">
 
@@ -5644,6 +5644,11 @@ function mostrarView(viewId) {
     if (viewId === 'controle-materiais-equipe') {
       carregarControleMateriaisEquipe();
     }
+
+     if (viewId === 'descontos-materiais') {
+  _descItens = [];
+  renderItensDesc();
+}
 
     if (viewId === 'ensaios-localizador') {
       locNr10Carregar();
@@ -21151,11 +21156,6 @@ function exportarAnaliseTrocasCSV() {
   URL.revokeObjectURL(url);
 }
 
-
-// ══════════════════════════════════════════
-//  DESCONTOS MATERIAIS
-// ══════════════════════════════════════════
-
 var _descItens = [];
 
 // Converte número para extenso em português
@@ -21210,7 +21210,7 @@ function filtrarColabDesc() {
   document.getElementById('descColabId').value = '';
   document.getElementById('descCardColab').style.display = 'none';
   if (!termo) { lista.style.display = 'none'; return; }
-  var res = (dadosGCA && dadosGCA.colaboradores || [])
+  var res = colaboradores
     .filter(function(c){ return c.nome.toLowerCase().includes(termo) || (c.matricula||'').toLowerCase().includes(termo); })
     .slice(0,12);
   if (!res.length) { lista.innerHTML = '<div style="padding:10px 14px; color:#64748b; font-size:13px;">Nenhum resultado</div>'; lista.style.display='block'; return; }
@@ -21242,12 +21242,12 @@ function filtrarItensDesc() {
   var lista = document.getElementById('descItemLista');
   document.getElementById('descItemId').value = '';
   if (!termo) { lista.style.display = 'none'; return; }
-  var res = (dadosGCA && dadosGCA.itens || [])
+  var res = itens
     .filter(function(i){ return i.descricao.toLowerCase().includes(termo) || i.codigo.toLowerCase().includes(termo); })
     .slice(0,15);
   if (!res.length) { lista.innerHTML='<div style="padding:10px 14px;color:#64748b;font-size:13px;">Nenhum resultado</div>'; lista.style.display='block'; return; }
   lista.innerHTML = res.map(function(i){
-    var val = parseFloat(i.valor||i.preco||0);
+    var val = parseFloat(i.valor || 0);
     return '<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);" '
       + 'onmouseover="this.style.background=\'rgba(0,184,230,0.1)\'" onmouseout="this.style.background=\'\'" '
       + 'onmousedown="selecionarItemDesc(\''+i.id+'\',\''+i.descricao.replace(/'/g,"\\'")+'\','+val+')">'
