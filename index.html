@@ -599,7 +599,7 @@
                 <li><button data-view="consulta-colaboradores">👨🏻‍⚖️ Consulta de Colaboradores</button></li>
                 <li><button data-view="consulta-estoque">🧮 Consulta de Estoque</button></li>
                 <li><button data-view="consulta-dotacao">🧰 Consulta de Dotação Função</button></li>
-               <li><button data-view="secaoDescontos">💰 Descontos Materiais</button></li>
+               <li><button data-view="view-descontos-materiais">💰 Descontos Materiais</button></li>
               </ul>
             </li>
 
@@ -1183,6 +1183,190 @@
 
 </section>
 
+
+<section class="view hidden" id="view-descontos-materiais">
+  <!-- ══ SEÇÃO: DESCONTOS MATERIAIS ══ -->
+<div id="secaoDescontos" style="display:none; padding:20px; max-width:880px; margin:0 auto;">
+
+  <!-- Sub-tabs -->
+  <div style="display:flex; gap:10px; margin-bottom:20px;">
+    <button id="tabDescGerar" onclick="mudarTabDesc('gerar')"
+      style="display:flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px;
+      border:1px solid rgba(0,184,230,0.4); background:rgba(0,184,230,0.15);
+      color:#00B8E6; font-size:14px; font-weight:600; cursor:pointer;">
+      📄 Gerar Desconto
+    </button>
+    <button id="tabDescHist" onclick="mudarTabDesc('historico')"
+      style="display:flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px;
+      border:1px solid rgba(148,163,184,0.15); background:rgba(255,255,255,0.03);
+      color:#64748b; font-size:14px; font-weight:600; cursor:pointer;">
+      📋 Histórico
+    </button>
+  </div>
+
+  <!-- ── GERAR DESCONTO ── -->
+  <div id="painelDescGerar">
+
+    <!-- Colaborador -->
+    <div style="background:rgba(17,24,39,0.85); border:1px solid rgba(148,163,184,0.1); border-radius:18px; padding:22px 26px; margin-bottom:16px;">
+      <div style="font-size:10px; font-weight:700; color:#00B8E6; text-transform:uppercase; letter-spacing:2px; margin-bottom:18px; display:flex; align-items:center; gap:8px;">
+        👤 Colaborador
+        <span style="flex:1; height:1px; background:linear-gradient(to right, rgba(0,184,230,0.3), transparent); display:block;"></span>
+      </div>
+      <div style="position:relative;">
+        <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.3px;">Nome ou Matrícula *</label>
+        <input id="descBuscaColab" placeholder="Digite o nome ou matrícula..."
+          style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;"
+          autocomplete="off" oninput="filtrarColabDesc()">
+        <div id="descListaColab" style="position:absolute; top:calc(100% + 4px); left:0; right:0; background:rgba(10,17,32,0.98); border:1px solid rgba(0,184,230,0.25); border-radius:12px; max-height:220px; overflow-y:auto; z-index:300; display:none; box-shadow:0 16px 48px rgba(0,0,0,0.5);"></div>
+      </div>
+      <div id="descCardColab" style="display:none; background:rgba(0,184,230,0.07); border:1px solid rgba(0,184,230,0.2); border-radius:10px; padding:12px 14px; margin-top:10px; display:none; align-items:center; gap:12px;">
+        <div style="width:36px; height:36px; border-radius:50%; background:rgba(0,184,230,0.15); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">👤</div>
+        <div>
+          <div style="font-weight:700; color:#e2e8f0; font-size:14px;" id="descColabNomeDisplay"></div>
+          <div style="font-size:12px; color:#64748b; margin-top:2px;" id="descColabMetaDisplay"></div>
+        </div>
+      </div>
+      <input id="descColabId"       type="hidden">
+      <input id="descColabNome"     type="hidden">
+      <input id="descColabMatricula" type="hidden">
+    </div>
+
+    <!-- Itens -->
+    <div style="background:rgba(17,24,39,0.85); border:1px solid rgba(148,163,184,0.1); border-radius:18px; padding:22px 26px; margin-bottom:16px;">
+      <div style="font-size:10px; font-weight:700; color:#00B8E6; text-transform:uppercase; letter-spacing:2px; margin-bottom:18px; display:flex; align-items:center; gap:8px;">
+        📦 Itens do Desconto
+        <span style="flex:1; height:1px; background:linear-gradient(to right, rgba(0,184,230,0.3), transparent); display:block;"></span>
+      </div>
+      <div style="background:rgba(0,0,0,0.25); border-radius:14px; padding:16px; margin-bottom:14px; border:1px solid rgba(255,255,255,0.04);">
+        <div style="display:grid; grid-template-columns:1fr 120px; gap:12px; margin-bottom:10px;">
+          <div style="position:relative;">
+            <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Item</label>
+            <input id="descItemBusca" placeholder="Digite o nome do item..." autocomplete="off"
+              style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;"
+              oninput="filtrarItensDesc()">
+            <div id="descItemLista" style="position:absolute; top:calc(100% + 4px); left:0; right:0; background:rgba(10,17,32,0.98); border:1px solid rgba(0,184,230,0.25); border-radius:12px; max-height:220px; overflow-y:auto; z-index:300; display:none; box-shadow:0 16px 48px rgba(0,0,0,0.5);"></div>
+            <input id="descItemId"    type="hidden">
+            <input id="descItemNome"  type="hidden">
+            <input id="descItemValor" type="hidden">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Qtd *</label>
+            <input id="descItemQtd" type="number" min="1" placeholder="0"
+              style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+          </div>
+        </div>
+        <button onclick="adicionarItemDesc()"
+          style="width:100%; background:rgba(0,184,230,0.07); border:1.5px dashed rgba(0,184,230,0.35); border-radius:12px; padding:12px; color:#00B8E6; font-size:14px; font-weight:600; cursor:pointer;">
+          ➕ Adicionar Item
+        </button>
+      </div>
+      <div id="descListaItens">
+        <p style="color:#64748b; text-align:center; padding:16px; font-size:13px;">Nenhum item adicionado</p>
+      </div>
+      <!-- Total -->
+      <div id="descTotalWrap" style="display:none; background:rgba(0,184,230,0.06); border:1px solid rgba(0,184,230,0.2); border-radius:12px; padding:14px 18px; margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:13px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">💰 Valor Total do Desconto</span>
+        <span id="descTotalValor" style="font-size:22px; font-weight:800; color:#00B8E6;">R$ 0,00</span>
+      </div>
+    </div>
+
+    <!-- Configuração -->
+    <div style="background:rgba(17,24,39,0.85); border:1px solid rgba(148,163,184,0.1); border-radius:18px; padding:22px 26px; margin-bottom:16px;">
+      <div style="font-size:10px; font-weight:700; color:#00B8E6; text-transform:uppercase; letter-spacing:2px; margin-bottom:18px; display:flex; align-items:center; gap:8px;">
+        ⚙️ Configuração do Desconto
+        <span style="flex:1; height:1px; background:linear-gradient(to right, rgba(0,184,230,0.3), transparent); display:block;"></span>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+        <div>
+          <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Motivo *</label>
+          <select id="descMotivo" style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+            <option value="">Selecione...</option>
+            <option value="PERDA DE MATERIAL">📦 Perda de Material</option>
+            <option value="DANO">🔨 Dano</option>
+            <option value="MAU USO">⚠️ Mau Uso</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Parcelas *</label>
+          <select id="descParcelas" onchange="calcularParcelasDesc()"
+            style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+            <option value="">Selecione...</option>
+            <option value="1">1x (à vista)</option>
+            <option value="2">2x</option>
+            <option value="3">3x</option>
+            <option value="4">4x</option>
+            <option value="5">5x</option>
+            <option value="6">6x</option>
+            <option value="7">7x</option>
+            <option value="8">8x</option>
+            <option value="9">9x</option>
+            <option value="10">10x</option>
+            <option value="11">11x</option>
+            <option value="12">12x</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Mês do 1º Desconto *</label>
+          <input id="descMesPrimeiro" type="month" onchange="calcularParcelasDesc()"
+            style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Cidade *</label>
+          <input id="descCidade" placeholder="Ex: São Paulo" list="descCidadeList"
+            style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+          <datalist id="descCidadeList">
+            <option value="São Paulo">
+            <option value="Maricá">
+            <option value="Rio de Janeiro">
+            <option value="Fortaleza">
+            <option value="Macapá">
+            <option value="Teresina">
+            <option value="Caruaru">
+            <option value="Boa Vista">
+          </datalist>
+        </div>
+      </div>
+
+      <!-- Preview das parcelas -->
+      <div id="descPreviewParcelas" style="display:none; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:16px; margin-top:4px;">
+        <div style="font-size:11px; font-weight:700; color:#00B8E6; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">📅 Cronograma de Parcelas</div>
+        <div id="descGridParcelas" style="display:grid; grid-template-columns:1fr 1fr; gap:4px 20px;"></div>
+      </div>
+    </div>
+
+    <div id="descMsgGerar" style="text-align:center; font-size:13px; min-height:18px; padding:10px; border-radius:10px; margin-bottom:12px;"></div>
+
+    <button onclick="gerarPdfDescontoUI()" id="btnGerarPdfDesc"
+      style="width:100%; background:linear-gradient(135deg,#00B8E6,#0369a1); border:none; border-radius:12px; padding:15px; color:#fff; font-family:'Syne',sans-serif; font-size:15px; font-weight:700; cursor:pointer; letter-spacing:0.3px; transition:all 0.2s;">
+      🖨️ Gerar PDF de Desconto
+    </button>
+  </div>
+
+  <!-- ── HISTÓRICO ── -->
+  <div id="painelDescHist" style="display:none;">
+    <div style="background:rgba(17,24,39,0.85); border:1px solid rgba(148,163,184,0.1); border-radius:18px; padding:22px 26px; margin-bottom:16px;">
+      <div style="font-size:10px; font-weight:700; color:#00B8E6; text-transform:uppercase; letter-spacing:2px; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+        🔍 Buscar Histórico
+        <span style="flex:1; height:1px; background:linear-gradient(to right, rgba(0,184,230,0.3), transparent); display:block;"></span>
+      </div>
+      <div style="position:relative; margin-bottom:12px;">
+        <input id="descHistBusca" placeholder="Digite o nome do colaborador..."
+          style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+      </div>
+      <button onclick="carregarHistoricoDesc()"
+        style="width:100%; background:linear-gradient(135deg,#00B8E6,#0369a1); border:none; border-radius:10px; padding:13px; color:#fff; font-size:14px; font-weight:700; cursor:pointer;">
+        🔄 Buscar
+      </button>
+    </div>
+    <div id="descListaHist">
+      <p style="color:#64748b; text-align:center; padding:40px; font-size:13px;">Digite um nome para buscar o histórico.</p>
+    </div>
+  </div>
+
+</div>
+</section>
+       
                 <!-- CADASTRO DE ITENS -->
         <section class="view hidden" id="view-cadastro-itens">
           <h2>Cadastrar Itens em Estoque 📦</h2>
