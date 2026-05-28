@@ -21210,7 +21210,7 @@ function filtrarColabDesc() {
   document.getElementById('descCardColab').style.display = 'none';
   if (!termo) { lista.style.display = 'none'; return; }
   var res = colaboradores
-    .filter(function(c){ return c.nome.toLowerCase().includes(termo) || (c.matricula||'').toLowerCase().includes(termo); })
+    .filter(function(c){ return c.nome.toLowerCase().includes(termo) || String(c.matricula||'').includes(termo); })
     .slice(0,12);
   if (!res.length) { lista.innerHTML = '<div style="padding:10px 14px; color:#64748b; font-size:13px;">Nenhum resultado</div>'; lista.style.display='block'; return; }
   lista.innerHTML = res.map(function(c){
@@ -21233,7 +21233,15 @@ function selecionarColabDesc(id, nome, matricula) {
   document.getElementById('descColabMetaDisplay').textContent = 'Matrícula: ' + matricula;
   document.getElementById('descCardColab').style.display = 'flex';
 }
-document.getElementById('descBuscaColab').addEventListener('blur', function(){ setTimeout(function(){ document.getElementById('descListaColab').style.display='none'; }, 200); });
+var _descBuscaColabEl = document.getElementById('descBuscaColab');
+if (_descBuscaColabEl) {
+  _descBuscaColabEl.addEventListener('blur', function(){
+    setTimeout(function(){ 
+      var l = document.getElementById('descListaColab');
+      if (l) l.style.display = 'none';
+    }, 200);
+  });
+}
 
 // ── Autocomplete Itens ──
 function filtrarItensDesc() {
