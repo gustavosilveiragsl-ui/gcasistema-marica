@@ -599,6 +599,7 @@
                 <li><button data-view="consulta-colaboradores">👨🏻‍⚖️ Consulta de Colaboradores</button></li>
                 <li><button data-view="consulta-estoque">🧮 Consulta de Estoque</button></li>
                 <li><button data-view="consulta-dotacao">🧰 Consulta de Dotação Função</button></li>
+               <li><button data-view="secaoDescontos">💰 Descontos Materiais</button></li>
               </ul>
             </li>
 
@@ -1183,6 +1184,187 @@
 </section>
 
 
+       <!-- ══ SEÇÃO: DESCONTOS MATERIAIS ══ -->
+<section class="view hidden" id="secaoDescontos">
+
+  <!-- Sub-tabs -->
+  <div style="display:flex; gap:10px; margin-bottom:20px;">
+    <button id="tabDescGerar" onclick="mudarTabDesc('gerar')"
+      style="display:flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px;
+      border:1px solid rgba(0,184,230,0.4); background:rgba(0,184,230,0.15);
+      color:#00B8E6; font-size:14px; font-weight:600; cursor:pointer;">
+      📄 Gerar Desconto
+    </button>
+    <button id="tabDescHist" onclick="mudarTabDesc('historico')"
+      style="display:flex; align-items:center; gap:8px; padding:10px 20px; border-radius:10px;
+      border:1px solid rgba(148,163,184,0.15); background:rgba(255,255,255,0.03);
+      color:#64748b; font-size:14px; font-weight:600; cursor:pointer;">
+      📋 Histórico
+    </button>
+  </div>
+
+  <!-- ── GERAR DESCONTO ── -->
+  <div id="painelDescGerar">
+
+    <!-- Colaborador -->
+    <div style="background:rgba(17,24,39,0.85); border:1px solid rgba(148,163,184,0.1); border-radius:18px; padding:22px 26px; margin-bottom:16px;">
+      <div style="font-size:10px; font-weight:700; color:#00B8E6; text-transform:uppercase; letter-spacing:2px; margin-bottom:18px; display:flex; align-items:center; gap:8px;">
+        👤 Colaborador
+        <span style="flex:1; height:1px; background:linear-gradient(to right, rgba(0,184,230,0.3), transparent); display:block;"></span>
+      </div>
+      <div style="position:relative;">
+        <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.3px;">Nome ou Matrícula *</label>
+        <input id="descBuscaColab" placeholder="Digite o nome ou matrícula..."
+          style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;"
+          autocomplete="off" oninput="filtrarColabDesc()">
+        <div id="descListaColab" style="position:absolute; top:calc(100% + 4px); left:0; right:0; background:rgba(10,17,32,0.98); border:1px solid rgba(0,184,230,0.25); border-radius:12px; max-height:220px; overflow-y:auto; z-index:300; display:none; box-shadow:0 16px 48px rgba(0,0,0,0.5);"></div>
+      </div>
+      <div id="descCardColab" style="display:none; background:rgba(0,184,230,0.07); border:1px solid rgba(0,184,230,0.2); border-radius:10px; padding:12px 14px; margin-top:10px; display:none; align-items:center; gap:12px;">
+        <div style="width:36px; height:36px; border-radius:50%; background:rgba(0,184,230,0.15); display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">👤</div>
+        <div>
+          <div style="font-weight:700; color:#e2e8f0; font-size:14px;" id="descColabNomeDisplay"></div>
+          <div style="font-size:12px; color:#64748b; margin-top:2px;" id="descColabMetaDisplay"></div>
+        </div>
+      </div>
+      <input id="descColabId"       type="hidden">
+      <input id="descColabNome"     type="hidden">
+      <input id="descColabMatricula" type="hidden">
+    </div>
+
+    <!-- Itens -->
+    <div style="background:rgba(17,24,39,0.85); border:1px solid rgba(148,163,184,0.1); border-radius:18px; padding:22px 26px; margin-bottom:16px;">
+      <div style="font-size:10px; font-weight:700; color:#00B8E6; text-transform:uppercase; letter-spacing:2px; margin-bottom:18px; display:flex; align-items:center; gap:8px;">
+        📦 Itens do Desconto
+        <span style="flex:1; height:1px; background:linear-gradient(to right, rgba(0,184,230,0.3), transparent); display:block;"></span>
+      </div>
+      <div style="background:rgba(0,0,0,0.25); border-radius:14px; padding:16px; margin-bottom:14px; border:1px solid rgba(255,255,255,0.04);">
+        <div style="display:grid; grid-template-columns:1fr 120px; gap:12px; margin-bottom:10px;">
+          <div style="position:relative;">
+            <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Item</label>
+            <input id="descItemBusca" placeholder="Digite o nome do item..." autocomplete="off"
+              style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;"
+              oninput="filtrarItensDesc()">
+            <div id="descItemLista" style="position:absolute; top:calc(100% + 4px); left:0; right:0; background:rgba(10,17,32,0.98); border:1px solid rgba(0,184,230,0.25); border-radius:12px; max-height:220px; overflow-y:auto; z-index:300; display:none; box-shadow:0 16px 48px rgba(0,0,0,0.5);"></div>
+            <input id="descItemId"    type="hidden">
+            <input id="descItemNome"  type="hidden">
+            <input id="descItemValor" type="hidden">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Qtd *</label>
+            <input id="descItemQtd" type="number" min="1" placeholder="0"
+              style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+          </div>
+        </div>
+        <button onclick="adicionarItemDesc()"
+          style="width:100%; background:rgba(0,184,230,0.07); border:1.5px dashed rgba(0,184,230,0.35); border-radius:12px; padding:12px; color:#00B8E6; font-size:14px; font-weight:600; cursor:pointer;">
+          ➕ Adicionar Item
+        </button>
+      </div>
+      <div id="descListaItens">
+        <p style="color:#64748b; text-align:center; padding:16px; font-size:13px;">Nenhum item adicionado</p>
+      </div>
+      <!-- Total -->
+      <div id="descTotalWrap" style="display:none; background:rgba(0,184,230,0.06); border:1px solid rgba(0,184,230,0.2); border-radius:12px; padding:14px 18px; margin-top:12px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:13px; color:#94a3b8; font-weight:600; text-transform:uppercase; letter-spacing:0.5px;">💰 Valor Total do Desconto</span>
+        <span id="descTotalValor" style="font-size:22px; font-weight:800; color:#00B8E6;">R$ 0,00</span>
+      </div>
+    </div>
+
+    <!-- Configuração -->
+    <div style="background:rgba(17,24,39,0.85); border:1px solid rgba(148,163,184,0.1); border-radius:18px; padding:22px 26px; margin-bottom:16px;">
+      <div style="font-size:10px; font-weight:700; color:#00B8E6; text-transform:uppercase; letter-spacing:2px; margin-bottom:18px; display:flex; align-items:center; gap:8px;">
+        ⚙️ Configuração do Desconto
+        <span style="flex:1; height:1px; background:linear-gradient(to right, rgba(0,184,230,0.3), transparent); display:block;"></span>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px;">
+        <div>
+          <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Motivo *</label>
+          <select id="descMotivo" style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+            <option value="">Selecione...</option>
+            <option value="PERDA DE MATERIAL">📦 Perda de Material</option>
+            <option value="DANO">🔨 Dano</option>
+            <option value="MAU USO">⚠️ Mau Uso</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Parcelas *</label>
+          <select id="descParcelas" onchange="calcularParcelasDesc()"
+            style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+            <option value="">Selecione...</option>
+            <option value="1">1x (à vista)</option>
+            <option value="2">2x</option>
+            <option value="3">3x</option>
+            <option value="4">4x</option>
+            <option value="5">5x</option>
+            <option value="6">6x</option>
+            <option value="7">7x</option>
+            <option value="8">8x</option>
+            <option value="9">9x</option>
+            <option value="10">10x</option>
+            <option value="11">11x</option>
+            <option value="12">12x</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Mês do 1º Desconto *</label>
+          <input id="descMesPrimeiro" type="month" onchange="calcularParcelasDesc()"
+            style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:600; color:#94a3b8; display:block; margin-bottom:6px; text-transform:uppercase;">Cidade *</label>
+          <input id="descCidade" placeholder="Ex: São Paulo" list="descCidadeList"
+            style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+          <datalist id="descCidadeList">
+            <option value="São Paulo">
+            <option value="Maricá">
+            <option value="Rio de Janeiro">
+            <option value="Fortaleza">
+            <option value="Macapá">
+            <option value="Teresina">
+            <option value="Caruaru">
+            <option value="Boa Vista">
+          </datalist>
+        </div>
+      </div>
+
+      <!-- Preview das parcelas -->
+      <div id="descPreviewParcelas" style="display:none; background:rgba(0,0,0,0.3); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:16px; margin-top:4px;">
+        <div style="font-size:11px; font-weight:700; color:#00B8E6; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px;">📅 Cronograma de Parcelas</div>
+        <div id="descGridParcelas" style="display:grid; grid-template-columns:1fr 1fr; gap:4px 20px;"></div>
+      </div>
+    </div>
+
+    <div id="descMsgGerar" style="text-align:center; font-size:13px; min-height:18px; padding:10px; border-radius:10px; margin-bottom:12px;"></div>
+
+    <button onclick="gerarPdfDescontoUI()" id="btnGerarPdfDesc"
+      style="width:100%; background:linear-gradient(135deg,#00B8E6,#0369a1); border:none; border-radius:12px; padding:15px; color:#fff; font-family:'Syne',sans-serif; font-size:15px; font-weight:700; cursor:pointer; letter-spacing:0.3px; transition:all 0.2s;">
+      🖨️ Gerar PDF de Desconto
+    </button>
+  </div>
+
+  <!-- ── HISTÓRICO ── -->
+  <div id="painelDescHist" style="display:none;">
+    <div style="background:rgba(17,24,39,0.85); border:1px solid rgba(148,163,184,0.1); border-radius:18px; padding:22px 26px; margin-bottom:16px;">
+      <div style="font-size:10px; font-weight:700; color:#00B8E6; text-transform:uppercase; letter-spacing:2px; margin-bottom:16px; display:flex; align-items:center; gap:8px;">
+        🔍 Buscar Histórico
+        <span style="flex:1; height:1px; background:linear-gradient(to right, rgba(0,184,230,0.3), transparent); display:block;"></span>
+      </div>
+      <div style="position:relative; margin-bottom:12px;">
+        <input id="descHistBusca" placeholder="Digite o nome do colaborador..."
+          style="width:100%; background:rgba(7,13,26,0.8); border:1.5px solid rgba(148,163,184,0.15); border-radius:10px; padding:12px 14px; color:#fff; font-size:14px;">
+      </div>
+      <button onclick="carregarHistoricoDesc()"
+        style="width:100%; background:linear-gradient(135deg,#00B8E6,#0369a1); border:none; border-radius:10px; padding:13px; color:#fff; font-size:14px; font-weight:700; cursor:pointer;">
+        🔄 Buscar
+      </button>
+    </div>
+    <div id="descListaHist">
+      <p style="color:#64748b; text-align:center; padding:40px; font-size:13px;">Digite um nome para buscar o histórico.</p>
+    </div>
+  </div>
+
+</div>
+</section>
 
                 <!-- CADASTRO DE ITENS -->
         <section class="view hidden" id="view-cadastro-itens">
@@ -20967,6 +21149,304 @@ function exportarAnaliseTrocasCSV() {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+
+// ══════════════════════════════════════════
+//  DESCONTOS MATERIAIS
+// ══════════════════════════════════════════
+
+var _descItens = [];
+
+// Converte número para extenso em português
+function numeroExtenso(valor) {
+  var un  = ['','um','dois','três','quatro','cinco','seis','sete','oito','nove',
+              'dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove'];
+  var dez = ['','','vinte','trinta','quarenta','cinquenta','sessenta','setenta','oitenta','noventa'];
+  var cen = ['','cento','duzentos','trezentos','quatrocentos','quinhentos',
+              'seiscentos','setecentos','oitocentos','novecentos'];
+  function c3(n) {
+    if (n === 0) return '';
+    if (n === 100) return 'cem';
+    var c = Math.floor(n/100), r = n%100;
+    var base = c > 0 ? cen[c] : '';
+    var resto = r === 0 ? '' : (r < 20 ? un[r] : dez[Math.floor(r/10)] + (r%10 ? ' e '+un[r%10] : ''));
+    return base + (base && resto ? ' e ' : '') + resto;
+  }
+  var inteiro = Math.floor(valor);
+  var cents   = Math.round((valor - inteiro) * 100);
+  var txt = '';
+  if (inteiro === 0) txt = 'zero';
+  else {
+    var mil = Math.floor(inteiro/1000), resto = inteiro%1000;
+    if (mil > 0) { txt += (mil === 1 ? 'mil' : c3(mil)+' mil'); if (resto > 0) txt += (resto < 100 ? ' e ' : ' '); }
+    if (resto > 0) txt += c3(resto);
+  }
+  txt = txt.charAt(0).toUpperCase() + txt.slice(1);
+  txt += inteiro === 1 ? ' real' : ' reais';
+  if (cents > 0) txt += ' e ' + c3(cents) + (cents === 1 ? ' centavo' : ' centavos');
+  return txt;
+}
+
+function mudarTabDesc(aba) {
+  document.getElementById('painelDescGerar').style.display = aba === 'gerar'    ? 'block' : 'none';
+  document.getElementById('painelDescHist').style.display  = aba === 'historico' ? 'block' : 'none';
+  var btnGerar = document.getElementById('tabDescGerar');
+  var btnHist  = document.getElementById('tabDescHist');
+  if (aba === 'gerar') {
+    btnGerar.style.cssText += 'border-color:rgba(0,184,230,0.4);background:rgba(0,184,230,0.15);color:#00B8E6;';
+    btnHist.style.cssText  += 'border-color:rgba(148,163,184,0.15);background:rgba(255,255,255,0.03);color:#64748b;';
+  } else {
+    btnHist.style.cssText  += 'border-color:rgba(0,184,230,0.4);background:rgba(0,184,230,0.15);color:#00B8E6;';
+    btnGerar.style.cssText += 'border-color:rgba(148,163,184,0.15);background:rgba(255,255,255,0.03);color:#64748b;';
+    carregarHistoricoDesc();
+  }
+}
+
+// ── Autocomplete Colaborador ──
+function filtrarColabDesc() {
+  var termo = document.getElementById('descBuscaColab').value.trim().toLowerCase();
+  var lista = document.getElementById('descListaColab');
+  document.getElementById('descColabId').value = '';
+  document.getElementById('descCardColab').style.display = 'none';
+  if (!termo) { lista.style.display = 'none'; return; }
+  var res = (dadosGCA && dadosGCA.colaboradores || [])
+    .filter(function(c){ return c.nome.toLowerCase().includes(termo) || (c.matricula||'').toLowerCase().includes(termo); })
+    .slice(0,12);
+  if (!res.length) { lista.innerHTML = '<div style="padding:10px 14px; color:#64748b; font-size:13px;">Nenhum resultado</div>'; lista.style.display='block'; return; }
+  lista.innerHTML = res.map(function(c){
+    return '<div style="padding:10px 14px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.04);" '
+      + 'onmouseover="this.style.background=\'rgba(0,184,230,0.1)\'" onmouseout="this.style.background=\'\'" '
+      + 'onmousedown="selecionarColabDesc(\''+c.id+'\',\''+c.nome.replace(/'/g,"\\'")+ '\',\''+c.matricula+'\')">'
+      + '<div style="font-size:14px;font-weight:600;color:#e2e8f0;">'+c.nome+'</div>'
+      + '<div style="font-size:11px;color:#64748b;margin-top:2px;">Mat: '+c.matricula+' · '+c.funcao+'</div></div>';
+  }).join('');
+  lista.style.display = 'block';
+}
+
+function selecionarColabDesc(id, nome, matricula) {
+  document.getElementById('descBuscaColab').value        = nome;
+  document.getElementById('descColabId').value           = id;
+  document.getElementById('descColabNome').value         = nome;
+  document.getElementById('descColabMatricula').value    = matricula;
+  document.getElementById('descListaColab').style.display = 'none';
+  document.getElementById('descColabNomeDisplay').textContent = nome;
+  document.getElementById('descColabMetaDisplay').textContent = 'Matrícula: ' + matricula;
+  document.getElementById('descCardColab').style.display = 'flex';
+}
+document.getElementById('descBuscaColab').addEventListener('blur', function(){ setTimeout(function(){ document.getElementById('descListaColab').style.display='none'; }, 200); });
+
+// ── Autocomplete Itens ──
+function filtrarItensDesc() {
+  var termo = document.getElementById('descItemBusca').value.trim().toLowerCase();
+  var lista = document.getElementById('descItemLista');
+  document.getElementById('descItemId').value = '';
+  if (!termo) { lista.style.display = 'none'; return; }
+  var res = (dadosGCA && dadosGCA.itens || [])
+    .filter(function(i){ return i.descricao.toLowerCase().includes(termo) || i.codigo.toLowerCase().includes(termo); })
+    .slice(0,15);
+  if (!res.length) { lista.innerHTML='<div style="padding:10px 14px;color:#64748b;font-size:13px;">Nenhum resultado</div>'; lista.style.display='block'; return; }
+  lista.innerHTML = res.map(function(i){
+    var val = parseFloat(i.valor||i.preco||0);
+    return '<div style="padding:10px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.04);" '
+      + 'onmouseover="this.style.background=\'rgba(0,184,230,0.1)\'" onmouseout="this.style.background=\'\'" '
+      + 'onmousedown="selecionarItemDesc(\''+i.id+'\',\''+i.descricao.replace(/'/g,"\\'")+'\','+val+')">'
+      + '<div style="font-size:14px;font-weight:600;color:#e2e8f0;">'+i.descricao+'</div>'
+      + '<div style="font-size:11px;color:#64748b;margin-top:2px;">'+i.codigo+' · Valor unit.: R$ '+val.toFixed(2).replace('.',',')+'</div></div>';
+  }).join('');
+  lista.style.display = 'block';
+}
+
+function selecionarItemDesc(id, nome, valor) {
+  document.getElementById('descItemBusca').value = nome;
+  document.getElementById('descItemId').value    = id;
+  document.getElementById('descItemNome').value  = nome;
+  document.getElementById('descItemValor').value = valor;
+  document.getElementById('descItemLista').style.display = 'none';
+  document.getElementById('descItemQtd').focus();
+}
+document.getElementById('descItemBusca').addEventListener('blur', function(){ setTimeout(function(){ document.getElementById('descItemLista').style.display='none'; }, 200); });
+
+// ── Itens do desconto ──
+function adicionarItemDesc() {
+  var id    = document.getElementById('descItemId').value;
+  var nome  = document.getElementById('descItemNome').value;
+  var valor = parseFloat(document.getElementById('descItemValor').value) || 0;
+  var qtd   = parseInt(document.getElementById('descItemQtd').value) || 0;
+  if (!id)    { mostrarMsgDesc('Selecione um item.', 'erro'); return; }
+  if (qtd <= 0) { mostrarMsgDesc('Informe a quantidade.', 'erro'); return; }
+  if (valor <= 0) { mostrarMsgDesc('Este item não tem valor cadastrado.', 'erro'); return; }
+  _descItens.push({ id, nome, valor, quantidade: qtd, subtotal: valor * qtd });
+  document.getElementById('descItemBusca').value = '';
+  document.getElementById('descItemId').value    = '';
+  document.getElementById('descItemNome').value  = '';
+  document.getElementById('descItemValor').value = '';
+  document.getElementById('descItemQtd').value   = '';
+  renderItensDesc();
+  calcularParcelasDesc();
+}
+
+function renderItensDesc() {
+  var el = document.getElementById('descListaItens');
+  if (!_descItens.length) {
+    el.innerHTML = '<p style="color:#64748b;text-align:center;padding:16px;font-size:13px;">Nenhum item adicionado</p>';
+    document.getElementById('descTotalWrap').style.display = 'none';
+    return;
+  }
+  el.innerHTML = _descItens.map(function(it, idx){
+    return '<div style="background:rgba(0,184,230,0.05);border:1px solid rgba(0,184,230,0.18);border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:12px;">'
+      + '<div style="flex:1;">'
+      + '<div style="font-weight:700;color:#e2e8f0;font-size:14px;margin-bottom:4px;">'+it.nome+'</div>'
+      + '<div style="font-size:12px;color:#64748b;">Qtd: <strong style="color:#00B8E6;">'+it.quantidade+'</strong> · Unit: R$ '+it.valor.toFixed(2).replace('.',',')+'</div>'
+      + '</div>'
+      + '<div style="text-align:right;flex-shrink:0;">'
+      + '<div style="font-size:16px;font-weight:800;color:#22c55e;">R$ '+it.subtotal.toFixed(2).replace('.',',')+'</div>'
+      + '<button onclick="_descItens.splice('+idx+',1);renderItensDesc();calcularParcelasDesc();" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.25);color:#ef4444;border-radius:6px;padding:3px 10px;font-size:11px;cursor:pointer;margin-top:4px;">✕ Remover</button>'
+      + '</div></div>';
+  }).join('');
+
+  var total = _descItens.reduce(function(acc,it){ return acc + it.subtotal; }, 0);
+  document.getElementById('descTotalValor').textContent = 'R$ ' + total.toFixed(2).replace('.',',');
+  document.getElementById('descTotalWrap').style.display = 'flex';
+}
+
+function calcularParcelasDesc() {
+  var total    = _descItens.reduce(function(acc,it){ return acc + it.subtotal; }, 0);
+  var parcelas = parseInt(document.getElementById('descParcelas').value) || 0;
+  var mesInput = document.getElementById('descMesPrimeiro').value; // "YYYY-MM"
+  var preview  = document.getElementById('descPreviewParcelas');
+  var grid     = document.getElementById('descGridParcelas');
+
+  if (!parcelas || !mesInput || total <= 0) { preview.style.display = 'none'; return; }
+
+  var valorParc = Math.round((total / parcelas) * 100) / 100;
+  var partes = mesInput.split('-');
+  var ano = parseInt(partes[0]), mes = parseInt(partes[1]);
+
+  var html = '';
+  for (var i = 0; i < parcelas; i++) {
+    html += '<div style="font-size:13px;color:#e2e8f0;padding:3px 0;">'
+          + '<span style="color:#64748b;">'+(i+1)+'–</span> '
+          + '<strong style="color:#00B8E6;">R$ '+valorParc.toFixed(2).replace('.',',')+'</strong>'
+          + ' <span style="color:#64748b;">('+String(mes).padStart(2,'0')+'/'+ano+')</span></div>';
+    mes++; if (mes > 12) { mes = 1; ano++; }
+  }
+  grid.innerHTML = html;
+  preview.style.display = 'block';
+}
+
+// ── Gerar PDF ──
+function gerarPdfDescontoUI() {
+  var colabId    = document.getElementById('descColabId').value;
+  var colabNome  = document.getElementById('descColabNome').value;
+  var matricula  = document.getElementById('descColabMatricula').value;
+  var motivo     = document.getElementById('descMotivo').value;
+  var parcelas   = document.getElementById('descParcelas').value;
+  var mesInput   = document.getElementById('descMesPrimeiro').value;
+  var cidade     = document.getElementById('descCidade').value.trim();
+
+  if (!colabId)    { mostrarMsgDesc('Selecione o colaborador.', 'erro'); return; }
+  if (!_descItens.length) { mostrarMsgDesc('Adicione pelo menos um item.', 'erro'); return; }
+  if (!motivo)     { mostrarMsgDesc('Selecione o motivo.', 'erro'); return; }
+  if (!parcelas)   { mostrarMsgDesc('Selecione o número de parcelas.', 'erro'); return; }
+  if (!mesInput)   { mostrarMsgDesc('Informe o mês do primeiro desconto.', 'erro'); return; }
+  if (!cidade)     { mostrarMsgDesc('Informe a cidade.', 'erro'); return; }
+
+  var total = _descItens.reduce(function(acc,it){ return acc + it.subtotal; }, 0);
+  var partes = mesInput.split('-'); // YYYY-MM
+  var mesPrimeiro = partes[1] + '/' + partes[0]; // MM/YYYY
+
+  var btn = document.getElementById('btnGerarPdfDesc');
+  btn.disabled  = true;
+  btn.innerHTML = '<span style="display:inline-block;animation:spin 1s linear infinite;">⚙️</span> Gerando PDF...';
+
+  google.script.run
+    .withSuccessHandler(function(res) {
+      btn.disabled  = false;
+      btn.innerHTML = '🖨️ Gerar PDF de Desconto';
+      if (!res.sucesso) { mostrarMsgDesc('Erro: ' + res.erro, 'erro'); return; }
+      mostrarMsgDesc('✅ PDF gerado com sucesso!', 'ok');
+      // Abre o PDF em nova aba
+      window.open(res.url, '_blank');
+      // Limpa o formulário
+      setTimeout(function(){
+        _descItens = [];
+        renderItensDesc();
+        document.getElementById('descBuscaColab').value   = '';
+        document.getElementById('descColabId').value      = '';
+        document.getElementById('descCardColab').style.display = 'none';
+        document.getElementById('descMotivo').value       = '';
+        document.getElementById('descParcelas').value     = '';
+        document.getElementById('descMesPrimeiro').value  = '';
+        document.getElementById('descCidade').value       = '';
+        document.getElementById('descPreviewParcelas').style.display = 'none';
+        mostrarMsgDesc('', '');
+      }, 3000);
+    })
+    .withFailureHandler(function(err) {
+      btn.disabled  = false;
+      btn.innerHTML = '🖨️ Gerar PDF de Desconto';
+      mostrarMsgDesc('Erro de conexão: ' + err.message, 'erro');
+    })
+    .gerarPdfDesconto({
+      colaboradorId:       colabId,
+      colaboradorNome:     colabNome,
+      matricula:           matricula,
+      itens:               _descItens,
+      valorTotal:          total,
+      valorExtenso:        numeroExtenso(total),
+      motivo:              motivo,
+      parcelas:            parseInt(parcelas),
+      mesPrimeiraParcela:  mesPrimeiro,
+      cidade:              cidade,
+      geradoPor:           getUsuarioLogado ? getUsuarioLogado() : 'Sistema'
+    });
+}
+
+function mostrarMsgDesc(txt, tipo) {
+  var el = document.getElementById('descMsgGerar');
+  el.textContent = txt;
+  el.style.cssText = 'text-align:center;font-size:13px;min-height:18px;padding:' + (txt ? '10px' : '0') + ';border-radius:10px;margin-bottom:12px;'
+    + (tipo === 'erro' ? 'background:rgba(239,68,68,0.08);color:#ef4444;border:1px solid rgba(239,68,68,0.25);' : '')
+    + (tipo === 'ok'   ? 'background:rgba(34,197,94,0.08);color:#22c55e;border:1px solid rgba(34,197,94,0.25);' : '');
+}
+
+// ── Histórico ──
+function carregarHistoricoDesc() {
+  var nome = document.getElementById('descHistBusca').value.trim();
+  var el   = document.getElementById('descListaHist');
+  el.innerHTML = '<div style="text-align:center;padding:30px;color:#00B8E6;font-size:14px;">⏳ Carregando...</div>';
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (!res.sucesso || !res.lista.length) {
+        el.innerHTML = '<p style="color:#64748b;text-align:center;padding:40px;font-size:13px;">Nenhum desconto encontrado.</p>';
+        return;
+      }
+      el.innerHTML = res.lista.map(function(d){
+        var itensNomes = (d['Itens']||[]).map(function(i){ return i.nome; }).join(', ');
+        return '<div style="background:rgba(17,24,39,0.85);border:1px solid rgba(148,163,184,0.1);border-radius:16px;padding:16px 20px;margin-bottom:10px;">'
+          + '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:10px;">'
+          + '<div style="font-size:12px;font-family:monospace;color:#00B8E6;">'+d['ID']+'</div>'
+          + '<span style="background:rgba(34,197,94,0.18);color:#22c55e;border:1px solid rgba(34,197,94,0.35);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;">✅ Gerado</span>'
+          + '</div>'
+          + '<div style="font-weight:700;color:#e2e8f0;font-size:15px;margin-bottom:6px;">👤 '+d['ColaboradorNome']+'</div>'
+          + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px;color:#64748b;margin-bottom:10px;">'
+          + '<span>📋 Matrícula: '+d['Matricula']+'</span>'
+          + '<span>💰 Total: <strong style="color:#00B8E6;">R$ '+(parseFloat(d['ValorTotal'])||0).toFixed(2).replace('.',',')+'</strong></span>'
+          + '<span>⚡ Motivo: '+d['Motivo']+'</span>'
+          + '<span>📅 Parcelas: '+d['Parcelas']+'x · A partir de '+d['MesPrimeiraParcela']+'</span>'
+          + '</div>'
+          + '<div style="font-size:12px;color:#64748b;margin-bottom:10px;">📦 '+itensNomes+'</div>'
+          + (d['PdfUrl'] ? '<a href="'+d['PdfUrl']+'" target="_blank" style="display:inline-block;background:rgba(0,184,230,0.12);border:1px solid rgba(0,184,230,0.3);border-radius:8px;padding:7px 16px;color:#00B8E6;font-size:13px;font-weight:600;text-decoration:none;">📄 Abrir PDF</a>' : '')
+          + '<span style="font-size:11px;color:#475569;float:right;margin-top:8px;">🕐 '+d['Data']+'</span>'
+          + '</div>';
+      }).join('');
+    })
+    .withFailureHandler(function(err){
+      el.innerHTML = '<p style="color:#ef4444;text-align:center;padding:40px;">Erro: '+err.message+'</p>';
+    })
+    .listarDescontos({ nome: nome || undefined });
+}
+
  
 </script>
 
