@@ -2,6 +2,10 @@
 <html>
 
 <head>
+
+  <script src="config.js"></script>
+
+
  <link rel="icon" type="image/png" href="https://i.postimg.cc/hvM5wcMw/LOGOTIPO-GCA.png">
   <base target="_top">
   <meta charset="UTF-8">
@@ -5914,91 +5918,84 @@ if (viewId === 'ensaios-devolucao') {
 
     const $ = s => document.querySelector(s);
     
+// ── Carrega dados do novo backend ──
+async function carregarDadosDoBackend() {
+  try {
+    const unidade = GCA_CONFIG.UNIDADE;
+
+    const [resColabs, resItens, resArmazens] = await Promise.all([
+      gcaFetch('/colaboradores?unidade=' + unidade),
+      gcaFetch('/itens?unidade=' + unidade),
+      gcaFetch('/armazens?unidade=' + unidade)
+    ]);
+
+    colaboradores          = resColabs.data  || [];
+    itens                  = resItens.data   || [];
+    window.itens           = itens;
+    armazens               = resArmazens.data || [];
+    usuarios               = [];
+    saldosBanco            = [];
+    equipes                = [];
+    materiais              = [];
+    estoqueMinimoConfig    = [];
+    window.catalogoArmazem = [];
+    catalogoArmazem        = [];
+    window.saldosBanco     = saldosBanco;
+    window.equipes         = equipes;
+    window.materiais       = materiais;
+    window.movimentacoes   = [];
+
+    renderSelectMotivosEntradaEnel();
+    inicializarAutocompleteMateriais();
+    bindAtendimentoEnel();
+    bindDevolucaoEnel();
+    bindSaidaEstoqueEnel();
+
+    console.log('📊 Dados carregados do backend:', {
+      colaboradores: colaboradores.length,
+      itens:         itens.length,
+      armazens:      armazens.length
+    });
+
+    $('#homeItens').textContent    = itens.length;
+    $('#homeColabs').textContent   = colaboradores.length;
+    $('#homeArmazens').textContent = armazens.length;
+
+  } catch(err) {
+    console.error('❌ Erro ao carregar dados do backend:', err);
+  }
+}
+
 window.addEventListener('load', function() {
-  console.log('🔄 Iniciando carregamento do sistema...');
-  
-  google.script.run
-    .withSuccessHandler(function(dados) {
-      console.log('✅ Dados recebidos:', dados);
-      
-      if (!dados) {
-        console.error('⚠️ carregarTodosDados retornou null — usando arrays vazios');
-        dados = {};
-      }
+  console.log('🔄 Iniciando GCA Sistema v2.0...');
+  document.getElementById('loading-inicial').style.display = 'none';
+  document.getElementById('loginView').classList.remove('hidden');
 
-      usuarios             = dados.usuarios      || [];
-      itens                = dados.itens         || [];
-      window.itens         = itens;   
-      colaboradores        = dados.colaboradores || [];
-      armazens             = dados.armazens      || [];
-      saldosBanco          = dados.saldos        || [];
-      equipes              = dados.equipes       || [];
-      materiais            = dados.materiais     || [];
-      estoqueMinimoConfig  = dados.estoqueMinimoConfig || [];
-      window.catalogoArmazem = dados.catalogoArmazem || [];
-      catalogoArmazem        = window.catalogoArmazem; // ✅ NOVO
-
-      renderSelectMotivosEntradaEnel();
-      inicializarAutocompleteMateriais();
-      bindAtendimentoEnel();
-      bindDevolucaoEnel();
-      bindSaidaEstoqueEnel();
-
-      window.saldosBanco          = saldosBanco;
-      window.equipes              = equipes;
-      window.materiais            = materiais;
-      window.movimentacoes        = [];
-      window.estoqueMinimoConfig  = estoqueMinimoConfig; // ✅ NOVO
-      
-
-      console.log('equipes recebidas:', equipes, 'qtd:', (equipes||[]).length);
-      console.log('📊 Totais carregados:', {
-        usuarios:      usuarios.length,
-        itens:         itens.length,
-        colaboradores: colaboradores.length,
-        armazens:      armazens.length
-      });
-      
-      document.getElementById('loading-inicial').style.display = 'none';
-      document.getElementById('loginView').classList.remove('hidden');
-    })
-    .withFailureHandler(function(erro) {
-      console.error('❌ Erro ao carregar dados:', erro);
-      usuarios = []; itens = []; colaboradores = [];
-      armazens = []; saldosBanco = []; equipes = []; materiais = []; window.catalogoArmazem = [];
-      catalogoArmazem = [];estoqueMinimoConfig = []; // ✅ NOVO
-      window.movimentacoes = [];
-      document.getElementById('loading-inicial').style.display = 'none';
-      document.getElementById('loginView').classList.remove('hidden');
-    })
-    .carregarTodosDados();
-
-    // Atualiza badge de solicitações a cada 2 minutos
-setTimeout(function iniciaPollingSolicitacoes() {
-  google.script.run
-    .withSuccessHandler(function(res) {
-      if (res && res.sucesso) {
-        window._todasSolicitacoes = res.lista || [];
-        if (typeof atualizarBadgeSolicitacoes === 'function') {
-          atualizarBadgeSolicitacoes();
+  // Polling de solicitações a cada 2 minutos
+  setTimeout(function iniciaPollingSolicitacoes() {
+    gcaFetch('/solicitacoes?unidade=' + GCA_CONFIG.UNIDADE)
+      .then(function(res) {
+        if (res && res.data) {
+          window._todasSolicitacoes = res.data || [];
+          if (typeof atualizarBadgeSolicitacoes === 'function') {
+            atualizarBadgeSolicitacoes();
+          }
         }
-      }
-      setTimeout(iniciaPollingSolicitacoes, 120000);
-    })
-    .withFailureHandler(function() {
-      setTimeout(iniciaPollingSolicitacoes, 120000);
-    })
-    .listarSolicitacoesMaterial({});
-}, 5000);
+        setTimeout(iniciaPollingSolicitacoes, 120000);
+      })
+      .catch(function() {
+        setTimeout(iniciaPollingSolicitacoes, 120000);
+      });
+  }, 5000);
 });
-    
+
 $('#lgPass')?.addEventListener('keypress', function(e) {
   if (e.key === 'Enter') fazerLogin();
 });
 
 $('#btnLogin')?.addEventListener('click', fazerLogin);
 
-function fazerLogin() {
+async function fazerLogin() {
   const username = $('#lgUser').value.trim();
   const password = $('#lgPass').value;
   const msg = $('#lgMsg');
@@ -6009,50 +6006,56 @@ function fazerLogin() {
     return;
   }
 
-  if (usuarios.length === 0) {
+  msg.style.color = '#94a3b8';
+  msg.textContent = '⏳ Verificando...';
+
+  try {
+    const res = await gcaFetch('/auth/login', 'POST', { username, password });
+
+    if (!res.ok) {
+      msg.style.color = '#f87171';
+      msg.textContent = '❌ ' + (res.erro || 'Usuário ou senha incorretos!');
+      return;
+    }
+
+    // Salva o token
+    localStorage.setItem('gca_token', res.token);
+
+    const user = res.usuario;
+    usuarioLogado = user;
+
+    $('#userFullName').textContent = user.nome;
+
+    const roleLabels = {
+      admin:        '👑 Administrador',
+      gestor:       '📊 Gestor',
+      segurança:    '🦺 Segurança',
+      assistente:   '👤 Assistente',
+      visualizador: '👁️ Visualizador'
+    };
+    $('#userRole').textContent = roleLabels[user.role] || '👤 Assistente';
+    $('#userBase').textContent = user.base || 'Matriz';
+
+    // Carrega dados do sistema
+    msg.style.color = '#94a3b8';
+    msg.textContent = '⏳ Carregando dados...';
+
+    await carregarDadosDoBackend();
+
+    aplicarPermissoesPerfil();
+
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('appContainer').classList.remove('hidden');
+
+    msg.textContent = '';
+    console.log('✅ Login realizado com sucesso!');
+
+  } catch(err) {
     msg.style.color = '#f87171';
-    msg.textContent = '❌ Erro ao carregar usuários. Recarregue a página.';
-    return;
+    msg.textContent = '❌ Erro de conexão. Tente novamente.';
+    console.error('[fazerLogin]', err);
   }
-
-  const user = usuarios.find(u => {
-    const usernameMatch = u.username.toLowerCase() === username.toLowerCase();
-    const passwordMatch = String(u.password).trim() === String(password).trim();
-    return usernameMatch && passwordMatch;
-  });
-
-  if (!user) {
-    msg.style.color = '#f87171';
-    msg.textContent = '❌ Usuário ou senha incorretos!';
-    return;
-  }
-
-  usuarioLogado = user;
-  $('#userFullName').textContent = user.name;
-
-  // Exibir perfil formatado
-  const roleLabels = {
-    admin:      '👑 Administrador',
-    gestor:     '📊 Gestor',
-    segurança:  '🦺 Segurança',
-    assistente: '👤 Assistente'
-  };
-  $('#userRole').textContent = roleLabels[user.role] || '👤 Assistente';
-  $('#userBase').textContent = user.base || 'Matriz';
-
-  $('#homeUsuarios').textContent = usuarios.length;
-  $('#homeItens').textContent = itens.length;
-  $('#homeColabs').textContent = colaboradores.length;
-  $('#homeArmazens').textContent = armazens.length;
-
-  aplicarPermissoesPerfil();
-
-  document.getElementById('loginView').classList.add('hidden');
-  document.getElementById('appContainer').classList.remove('hidden');
-
-  console.log('✅ Login realizado com sucesso!');
-} // ← ESTE } estava faltando!
-
+}
     
    // ===== LOGOUT =====
 document.getElementById('btnLogout')?.addEventListener('click', function() {
