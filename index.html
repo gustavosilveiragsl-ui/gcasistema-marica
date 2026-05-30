@@ -5925,7 +5925,7 @@ async function carregarDadosDoBackend() {
 
     const [resColabs, resItens, resArmazens] = await Promise.all([
       gcaFetch('/colaboradores?unidade=' + unidade),
-      gcaFetch('/itens?unidade=' + unidade),
+      gcaFetch('/itens?unidade=' + unidade + '&incluir_ambas=true'),
       gcaFetch('/armazens?unidade=' + unidade)
     ]);
 
