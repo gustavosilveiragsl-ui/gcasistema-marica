@@ -7052,8 +7052,8 @@ function verificarPermissao(acao) {
         
         let matchFiltro = true;
         if (filtro === 'com-ca') matchFiltro = !!item.ca;
-        if (filtro === 'com-ensaio') matchFiltro = item.requerEnsaio;
-        if (filtro === 'com-rastreio') matchFiltro = item.possuiRastreio;
+        if (filtro === 'com-ensaio') matchFiltro = item.requer_ensaio || item.requerEnsaio;
+if (filtro === 'com-rastreio') matchFiltro = item.possui_serie || item.possuiRastreio;
         
         return matchBusca && matchFiltro;
       });
@@ -7082,8 +7082,8 @@ function verificarPermissao(acao) {
         // Badges
         let badges = '';
         if (item.ca) badges += `<span style="background:#3b82f6; color:#fff; padding:2px 8px; border-radius:6px; font-size:10px; margin-right:4px;">CA ${item.ca}</span>`;
-        if (item.requerEnsaio) badges += `<span style="background:#f59e0b; color:#fff; padding:2px 8px; border-radius:6px; font-size:10px; margin-right:4px;">⚡ Ensaio</span>`;
-        if (item.possuiRastreio) badges += `<span style="background:#22c55e; color:#fff; padding:2px 8px; border-radius:6px; font-size:10px;">🔍 Rastreio</span>`;
+        if (item.requer_ensaio || item.requerEnsaio) badges += `<span style="background:#f59e0b; color:#fff; padding:2px 8px; border-radius:6px; font-size:10px; margin-right:4px;">⚡ Ensaio</span>`;
+        if (item.possui_serie || item.possuiRastreio) badges += `<span style="background:#22c55e; color:#fff; padding:2px 8px; border-radius:6px; font-size:10px;">🔍 Rastreio</span>`;
         
         card.innerHTML = `
           ${imgHtml}
@@ -7091,8 +7091,8 @@ function verificarPermissao(acao) {
           <p style="font-family:monospace; font-size:12px; color:#00B8E6; margin:0 0 8px 0;">${item.codigo}</p>
           <p style="font-size:13px; color:#94a3b8; margin:0 0 12px 0;">${item.categoria}</p>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span style="color:#22c55e; font-weight:700; font-size:18px;">R$ ${item.valor.toFixed(2)}</span>
-            <span style="color:#94a3b8; font-size:12px;">${item.unidade}</span>
+            <span style="color:#22c55e; font-weight:700; font-size:18px;">R$ ${(item.valor_unitario || item.valor || 0).toFixed(2)}</span>
+<span style="color:#94a3b8; font-size:12px;">${item.unidade_medida || item.unidade || ''}</span>
           </div>
           <div style="margin-top:8px;">
             ${badges}
