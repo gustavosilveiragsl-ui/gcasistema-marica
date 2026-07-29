@@ -6931,9 +6931,14 @@ function aplicarPermissoesPerfil() {
 }
 
   if (role === 'assistente') {
-    ocultarMenuGrupo('Cadastros');
-    ocultarMenuGrupo('Indicadores');
+    ocultarMenuGrupo('Atendimentos');
     ocultarMenuGrupo('Movimentação Estoque');
+    ocultarMenuGrupo('Cadastros');
+    ocultarMenuGrupo('Consulta');
+    ocultarMenuGrupo('Protheus E Compras');
+    ocultarMenuGrupo('Segurança');
+    ocultarMenuGrupo('Resíduos');
+    ocultarMenuGrupo('Indicadores');
     setTimeout(() => {
       document.querySelectorAll('button[onclick^="editar"]').forEach(btn => {
         btn.disabled      = true;
